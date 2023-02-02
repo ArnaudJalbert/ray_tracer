@@ -1,5 +1,6 @@
 
-
+--------------------------------------------------------------------
+TEACHER'S README
 This code is used for three purposes:
 
 1) Build the official course solution
@@ -35,3 +36,4 @@ Building the solution:
 
 
 Note that some test scenes are provided in the assets folder. You can do a soft link to the assets folder in the build folder for your convenience.
+--------------------------------------------------------------------
