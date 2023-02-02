@@ -43,14 +43,17 @@ void Camera::setPosition(const Vector3f &position) {
 }
 
 float Camera::getFov() const {
-    if(checkFOVRange()) {
         return fov;
-    }
-    else{}
 }
 
 void Camera::setFov(float fov) {
-    Camera::fov = fov;
+    if(checkFOVRange(fov)) {
+        Camera::fov = fov;
+    }
+    else{
+        invalidFOVRange();
+    }
+
 }
 
 bool Camera:: checkFOVRange(float value){
