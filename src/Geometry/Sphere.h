@@ -6,7 +6,6 @@
 #define RAYTRACER_SPHERE_H
 
 #include <Eigen/Dense>
-#include <ostream>
 #include <iostream>
 
 #include "Geometry.h"
