@@ -84,3 +84,10 @@ std::ostream &operator<<(std::ostream &os, const RGBColor &color) {
 }
 //----------------------
 
+
+void RGBColor::writeColor(std::ostream &out) const{
+    // Write the translated [0,255] value of each color component.
+    out << static_cast<int>(255.999 * this->r) << ' '
+        << static_cast<int>(255.999 * this->g) << ' '
+        << static_cast<int>(255.999 * this->b) << '\n';
+}

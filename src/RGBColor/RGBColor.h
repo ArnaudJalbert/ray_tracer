@@ -7,6 +7,9 @@
 
 
 #include <ostream>
+#include <string>
+
+using std::string;
 
 class RGBColor {
 
@@ -67,8 +70,10 @@ public:
     friend std::ostream &operator<<(std::ostream &os, const RGBColor &color);
     //----------------------
 
-
-
+    //------------------
+    // utility functions
+    void writeColor(std::ostream &out) const;
+    //------------------
 };
 
 
