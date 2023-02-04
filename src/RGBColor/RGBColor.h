@@ -68,6 +68,18 @@ public:
     //----------------------
     // operators overloading
     friend std::ostream &operator<<(std::ostream &os, const RGBColor &color);
+
+    friend RGBColor operator+(const RGBColor &u, const RGBColor &v);
+
+    friend RGBColor operator+(float t, const RGBColor &v);
+
+    friend RGBColor operator+(const RGBColor &u, float t);
+
+    friend RGBColor operator*(const RGBColor &u, const RGBColor &v);
+
+    friend RGBColor operator*(float t, const RGBColor &v);
+
+    friend RGBColor operator*(const RGBColor &v, float t);
     //----------------------
 
     //------------------

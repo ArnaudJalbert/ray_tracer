@@ -8,6 +8,8 @@
 #include <Eigen/Dense>
 #include <ostream>
 
+#include "RGBColor/RGBColor.h"
+
 using Eigen::Vector3f;
 
 #define DEFAULT_ORIGIN (Vector3f(0,0,0))
@@ -18,8 +20,8 @@ class Ray {
 
 private:
 
-    Vector3f origin;
-    Vector3f direction;
+    Vector3f origin; // origin of the ray
+    Vector3f direction; // direction of the ray
 
 public:
 

@@ -82,6 +82,34 @@ std::ostream &operator<<(std::ostream &os, const RGBColor &color) {
     os << "r: " << color.r << " g: " << color.g << " b: " << color.b;
     return os;
 }
+
+RGBColor operator+(const RGBColor &u, const RGBColor &v){
+    return {u.r + v.r, u.g + v.g, u.b + v.b};
+};
+
+RGBColor operator+(float t, const RGBColor &v){
+    return {t + v.r, t + v.g, t + v.b};
+};
+
+RGBColor operator+(const RGBColor &u, float t){
+    return t + u;
+};
+
+// simple color multiplication
+RGBColor operator*(const RGBColor &u, const RGBColor &v) {
+    return {u.r * v.r, u.g * v.g, u.b * v.b};
+}
+
+// scalar multiplication (float*RGBColor)
+RGBColor operator*(float t, const RGBColor &v) {
+    return {t*v.r, t*v.g, t*v.b};
+}
+
+// inverse (RGBColor * float)
+RGBColor operator*(const RGBColor &v, float t) {
+    return t*v;
+}
+
 //----------------------
 
 

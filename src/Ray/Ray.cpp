@@ -42,3 +42,4 @@ std::ostream &operator<<(std::ostream &os, const Ray &ray) {
 Vector3f Ray::at(double  t){
     return this->origin + this->direction * t;
 }
+
