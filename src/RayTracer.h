@@ -5,15 +5,18 @@
 #ifndef RAYTRACER_RAYTRACER_H
 #define RAYTRACER_RAYTRACER_H
 
-// namespaces
-using namespace std;
+#include <iostream>
 
-// C++ libraries includes
-
-// system and local libraries include
 #include "json.hpp"
 
+using std::cout;
+using std::endl;
+
 class RayTracer {
+
+private:
+
+    nlohmann::json json;
 
 public:
 
@@ -24,8 +27,7 @@ public:
     // it's the only method called in main so everything should start from here
     int run();
 
-private:
-    nlohmann::json json;
+
 };
 
 
