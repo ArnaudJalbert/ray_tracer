@@ -88,8 +88,8 @@ private:
     // filename in which to output the results
     string filename;
 
-    //--------
-    // methods
+    //-------------
+    // JSON parsing
 
     // parse the items in the json object
     void parseItems();
@@ -103,9 +103,15 @@ private:
     // create the light objects
     void createLightObjects();
 
-    // create the ouput parameters
+    // create the output parameters
     void createOutputParameters();
-    //--------
+    //-------------
+
+    //-----------------
+    // render the scene
+    bool render();
+    //-----------------
+
 
 public:
 
