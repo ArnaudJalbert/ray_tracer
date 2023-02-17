@@ -13,14 +13,22 @@ Sphere::Sphere() {
 
 }
 
-Sphere::Sphere(float radius, const Vector3f &centre){
+Sphere::Sphere(float radius, Vector3f *centre){
 
     this->setRadius(radius);
     this->setCentre(centre);
 
 }
 
-Sphere::Sphere(float ambientReflection, float diffuseReflection, float specularReflection, float phongCoefficient, const RGBColor &ambientColor, const RGBColor &diffuseColor, const RGBColor &specularColor, float radius, const Vector3f &centre) : Geometry(ambientReflection, diffuseReflection, specularReflection, phongCoefficient, ambientColor, diffuseColor, specularColor){
+Sphere::Sphere(float ambientReflection,
+               float diffuseReflection,
+               float specularReflection,
+               float phongCoefficient,
+               const RGBColor &ambientColor,
+               const RGBColor &diffuseColor,
+               const RGBColor &specularColor,
+               float radius,
+               Vector3f *centre) : Geometry(ambientReflection, diffuseReflection, specularReflection, phongCoefficient, ambientColor, diffuseColor, specularColor){
 
     this->setRadius(radius);
     this->setCentre(centre);
@@ -44,11 +52,11 @@ void Sphere::setRadius(float radius) {
     }
 }
 
-const Vector3f &Sphere::getCentre() const {
+Vector3f *Sphere::getCentre() const {
     return centre;
 }
 
-void Sphere::setCentre(const Vector3f &centre) {
+void Sphere::setCentre(Vector3f *centre) {
     this->centre = centre;
 }
 //--------------------
@@ -67,7 +75,7 @@ void Sphere::invalidRadiusSize() {
 //---------------------
 // operator overloading
 std::ostream &operator<<(std::ostream &os, const Sphere &sphere) {
-    os << static_cast<const Geometry &>(sphere) << " radius: " << sphere.radius << " centre: " << endl << sphere.centre;
+    os << static_cast<const Geometry &>(sphere) << " radius: " << sphere.radius << " centre: " << endl << *sphere.centre;
     return os;
 }
 //---------------------

@@ -11,7 +11,7 @@ Rectangle::Rectangle() {
     this->setP4(DEFAULT_P4);
 }
 
-Rectangle::Rectangle(const Vector3f &p1, const Vector3f &p2, const Vector3f &p3, const Vector3f &p4) {
+Rectangle::Rectangle(Vector3f *p1, Vector3f *p2, Vector3f *p3, Vector3f *p4) {
     this->setP1(p1);
     this->setP2(p2);
     this->setP3(p3);
@@ -25,10 +25,10 @@ Rectangle::Rectangle(float ambientReflection,
                      const RGBColor &ambientColor,
                      const RGBColor &diffuseColor,
                      const RGBColor &specularColor,
-                     const Vector3f &p1,
-                     const Vector3f &p2,
-                     const Vector3f &p3,
-                     const Vector3f &p4)
+                     Vector3f *p1,
+                     Vector3f *p2,
+                     Vector3f *p3,
+                     Vector3f *p4)
                      : Geometry(ambientReflection,
                                diffuseReflection,
                                specularReflection,
@@ -43,43 +43,44 @@ Rectangle::Rectangle(float ambientReflection,
                     this->setP4(p4);
 }
 
-const Vector3f &Rectangle::getP1() const {
+void Rectangle::setP1(Vector3f *p1) {
+    this->p1 = p1;
+}
+
+void Rectangle::setP2(Vector3f *p2) {
+    this->p2 = p2;
+}
+
+void Rectangle::setP3(Vector3f *p3) {
+    this->p3 = p3;
+}
+
+void Rectangle::setP4(Vector3f *p4) {
+    this->p4 = p4;
+}
+
+Vector3f *Rectangle::getP1() const {
     return p1;
 }
 
-void Rectangle::setP1(const Vector3f &p1) {
-    Rectangle::p1 = p1;
-}
-
-const Vector3f &Rectangle::getP2() const {
+Vector3f *Rectangle::getP2() const {
     return p2;
 }
 
-void Rectangle::setP2(const Vector3f &p2) {
-    Rectangle::p2 = p2;
-}
-
-const Vector3f &Rectangle::getP3() const {
+Vector3f *Rectangle::getP3() const {
     return p3;
 }
 
-void Rectangle::setP3(const Vector3f &p3) {
-    Rectangle::p3 = p3;
-}
-
-const Vector3f &Rectangle::getP4() const {
+Vector3f *Rectangle::getP4() const {
     return p4;
 }
 
-void Rectangle::setP4(const Vector3f &p4) {
-    Rectangle::p4 = p4;
-}
 
 std::ostream &operator<<(std::ostream &os, const Rectangle &rectangle) {
     os << static_cast<const Geometry &>(rectangle) << endl <<
-    " p1: " << endl << rectangle.p1 << endl <<
-    " p2: " << endl << rectangle.p2 << endl <<
-    " p3: " << endl << rectangle.p3 << endl <<
-    " p4: " << endl << rectangle.p4;
+    " p1: " << endl << *rectangle.p1 << endl <<
+    " p2: " << endl << *rectangle.p2 << endl <<
+    " p3: " << endl << *rectangle.p3 << endl <<
+    " p4: " << endl << *rectangle.p4;
     return os;
 }

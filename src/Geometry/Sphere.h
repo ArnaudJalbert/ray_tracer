@@ -15,7 +15,7 @@ using std::endl;
 using Eigen::Vector3f;
 
 #define DEFAULT_RADIUS (1.0f)
-#define DEFAULT_CENTRE (Vector3f(1.0f, 1.0f, 1.0f))
+#define DEFAULT_CENTRE (new Vector3f(1.0f, 1.0f, 1.0f))
 
 // Sphere is a type of geometry
 class Sphere : public Geometry{
@@ -23,7 +23,7 @@ class Sphere : public Geometry{
 private:
 
     float radius; // size of the radius of the sphere
-    Vector3f centre; // centre of the sphere in 3d space
+    Vector3f *centre; // centre of the sphere in 3d space
 
 public:
 
@@ -31,11 +31,11 @@ public:
     // constructors
     Sphere();
 
-    Sphere(float radius, const Vector3f &centre);
+    Sphere(float radius, Vector3f *centre);
 
     Sphere(float ambientReflection, float diffuseReflection, float specularReflection, float phongCoefficient,
            const RGBColor &ambientColor, const RGBColor &diffuseColor, const RGBColor &specularColor, float radius,
-           const Vector3f &centre);
+           Vector3f *centre);
     //-------------
 
     //--------------------
@@ -44,9 +44,9 @@ public:
 
     void setRadius(float radius);
 
-    const Vector3f &getCentre() const;
+    Vector3f *getCentre() const;
 
-    void setCentre(const Vector3f &centre);
+    void setCentre(Vector3f *centre);
     //--------------------
 
     //-------

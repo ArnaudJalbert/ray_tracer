@@ -8,37 +8,37 @@ Camera::Camera() {
     this->setLookat(DEFAULT_LOOKAT);
     this->setUp(DEFAULT_UP);
     this->setPosition(DEFAULT_POSITION);
-    this->setFov(60.0);
+    this->setFov(DEFAULT_FOV);
 }
 
-Camera::Camera(const Vector3f &lookat, const Vector3f &up, const Vector3f &position, float fov){
+Camera::Camera(Vector3f *lookat, Vector3f *up, Vector3f *position, float fov){
     this->setLookat(lookat);
     this->setUp(up);
     this->setPosition(position);
     this->setFov(fov);
 }
 
-const Vector3f &Camera::getLookat() const {
+Vector3f *Camera::getLookat() const {
     return lookat;
 }
 
-void Camera::setLookat(const Vector3f &lookat) {
+void Camera::setLookat(Vector3f *lookat) {
     Camera::lookat = lookat;
 }
 
-const Vector3f &Camera::getUp() const {
+Vector3f *Camera::getUp() const {
     return up;
 }
 
-void Camera::setUp(const Vector3f &up) {
+void Camera::setUp(Vector3f *up) {
     Camera::up = up;
 }
 
-const Vector3f &Camera::getPosition() const {
+Vector3f *Camera::getPosition() const {
     return position;
 }
 
-void Camera::setPosition(const Vector3f &position) {
+void Camera::setPosition(Vector3f *position) {
     Camera::position = position;
 }
 
@@ -65,7 +65,10 @@ void Camera::invalidFOVRange() {
 }
 
 std::ostream &operator<<(std::ostream &os, const Camera &camera) {
-    os << "lookat: " << camera.lookat << " up: " << camera.up << " position: " << camera.position << " fov: "
-       << camera.fov;
+    os << endl <<
+    "lookat: " << endl << *camera.lookat << endl <<
+    " up: " << endl << *camera.up << endl <<
+    " position: " << endl << *camera.position <<  endl <<
+    " fov: " << endl << camera.fov << endl;
     return os;
 }
