@@ -15,6 +15,7 @@ RayTracer::RayTracer(nlohmann::json j) {
 int RayTracer::run() {
 
 
+
     return 1;
 }
 
@@ -37,17 +38,37 @@ void RayTracer::createObjects(const string& objectType) {
         this->createGeometryObjects();
 
         // TESTING
-//        cout << "RECTANGLES" << endl;
-//        for(auto e: this->rectangles)
-//            cout << *e << endl;
-//
-//        cout << "SPHERES" << endl;
-//        for(auto e: this->spheres)
-//            cout << *e << endl;
+        cout << "RECTANGLES" << endl;
+        for(auto e: this->rectangles)
+            cout << *e << endl;
+
+        cout << "SPHERES" << endl;
+        for(auto e: this->spheres)
+            cout << *e << endl;
         // END OF TESTING
     }
-    if(objectType == "geometry"){
+    if(objectType == "light"){
+        this->createLightObjects();
 
+        // TESTING
+        cout << "AREA LIGHTS" << endl;
+        for(auto e: this->areaLights)
+            cout << *e << endl;
+
+        cout << "POINT LIGHTS" << endl;
+        for(auto e: this->pointLights)
+            cout << *e << "end" << endl;
+        // END OF TESTING
+    }
+    if (objectType == "output"){
+        this->createOutputParameters();
+        // TESTING
+        cout << "FILENAME: " << this->filename << endl;
+
+        cout << "RESOLUTION: " << this->resolution.width << "X" << this->resolution.height << endl;
+
+        cout << "CAMERA: " << *this->camera << endl;
+        // END OF TESTING
     }
 }
 
@@ -139,6 +160,100 @@ void RayTracer::createGeometryObjects() {
             this->rectangles.push_back(rectangle);
 
         }
+    }
+}
+
+void RayTracer::createLightObjects() {
+
+    // retrieving the array of lights
+    auto lightArray = this->json["light"];
+
+    for(auto light: lightArray){
+
+        // these elements are common to the area light and point light
+
+        // intensity values
+        RGBColor diffuseIntensity(light["id"][0],
+                                  light["id"][1],
+                                  light["id"][2]);
+
+        RGBColor specularIntensity(light["is"][0],
+                                   light["is"][1],
+                                   light["is"][2]);
+
+        if(light["type"] == "area"){
+
+            // creating the four points
+            Vector3f* p1 = new Vector3f(light["p1"][0],
+                                        light["p1"][1],
+                                        light["p1"][2]);
+
+            Vector3f* p2 = new Vector3f(light["p2"][0],
+                                        light["p2"][1],
+                                        light["p2"][2]);
+
+            Vector3f* p3 = new Vector3f(light["p3"][0],
+                                        light["p3"][1],
+                                        light["p3"][2]);
+
+            Vector3f* p4 = new Vector3f(light["p4"][0],
+                                        light["p4"][1],
+                                        light["p4"][2]);
+
+            // creating the object
+            AreaLight* areaLight = new AreaLight();
+
+            // adding the object to the list
+            this->areaLights.push_back(areaLight);
+        }
+
+        if(light["type"] == "point"){
+
+            // creating the centre
+            Vector3f* centre = new Vector3f(light["centre"][0],
+                                            light["centre"][1],
+                                            light["centre"][2]);
+
+            // creating the object
+            PointLight* pointLight = new PointLight();
+
+            // adding the object to the list
+            this->pointLights.push_back(pointLight);
+        }
+    }
+}
+
+void RayTracer::createOutputParameters() {
+
+    // retrieving the array of lights
+    auto outputArray = this->json["output"];
+
+    for(auto output: outputArray){
+
+        // ray tracer parameters
+        this->filename = output["filename"];
+        this->resolution.width = output["size"][0];
+        this->resolution.height = output["size"][1];
+
+        // camera parameters
+        Vector3f *lookat = new Vector3f(output["lookat"][0],
+                                        output["lookat"][1],
+                                        output["lookat"][2]);
+
+        Vector3f *up = new Vector3f(output["up"][0],
+                                    output["up"][1],
+                                    output["up"][2]);
+
+        Vector3f *position = new Vector3f(output["centre"][0],
+                                          output["centre"][1],
+                                          output["centre"][2]);
+
+        float fov = output["fov"];
+
+        Camera *camera = new Camera(lookat, up, position, fov);
+
+        this->camera = camera;
+
     }
 }
 

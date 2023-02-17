@@ -63,24 +63,30 @@ private:
     // elements of the scenes
 
     // vectors of geometry pointers
-
     // rectangles
     vector<Rectangle*> rectangles;
 
     // spheres
     vector<Sphere*> spheres;
 
-    // array of light objects -> point or area
-    Light* lights;
+    // vectors of light objects
+    // area lights
+    vector<AreaLight*> areaLights;
+
+    // point lights
+    vector<PointLight*> pointLights;
 
     // camera of the scene
     Camera* camera;
 
     // resolution of the image
-    struct resolution {
-        int x;
-        int y;
-    };
+    struct resolution{
+        int width;
+        int height;
+    } resolution;
+
+    // filename in which to output the results
+    string filename;
 
     //--------
     // methods
@@ -93,6 +99,12 @@ private:
 
     // creates the geometry objects
     void createGeometryObjects();
+
+    // create the light objects
+    void createLightObjects();
+
+    // create the ouput parameters
+    void createOutputParameters();
     //--------
 
 public:
