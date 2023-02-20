@@ -20,7 +20,6 @@ Camera::Camera(Vector3f *lookat, Vector3f *up, Vector3f *position,
     this->setUp(up);
     this->setPosition(position);
     this->setFov(fov);
-    this->setAspect(aspect);
     this->resolution.width = width;
     this->resolution.height = height;
 
@@ -67,25 +66,7 @@ void Camera::setFov(float fov) {
 
 }
 
-float Camera::getAspect() const {
-    return this->aspect;
-}
 
-void Camera::setAspect(float aspect) {
-    this->aspect = aspect;
-}
-
-Vector3f *Camera::getAlignment() {
-    return this->alignment;
-}
-
-Vector3f *Camera::getUt() {
-    return this->u;
-}
-
-Vector3f *Camera::getV() {
-    return this->v;
-}
 //-------------------
 
 //-------
@@ -97,9 +78,6 @@ bool Camera:: checkFOVRange(float value){
 void Camera::invalidFOVRange() {
     //TODO handle the exception
 }
-
-
-
 //-------
 
 //----------------------
@@ -116,49 +94,79 @@ std::ostream &operator<<(std::ostream &os, const Camera &camera) {
 
 //------------------
 // utility functions
-void Camera::updateCameraGeometry() {
+void Camera::initCameraGeometry() {
 
-    Vector3f test = *this->lookat - *this->position;
-    // compute the alignment vector -> From position to lookat
-    this->alignment = new Vector3f(*this->lookat - *this->position);
-    // the vector needs to be normalized
-    this->alignment->normalize();
+    // normalize lookat and up vector
+    this->lookat->normalize();
+    this->up->normalize();
 
-    // compute u vector and normalize it
-    this->u = new Vector3f(this->alignment->cross(*this->up));
+    // aspect ratio
+    this->aspectRatio = float(this->resolution.width) / float(this->resolution.height);
+
+    // centre of the projection plane
+    this->a = new Vector3f(*this->position + (*this->lookat * PLANE_DISTANCE));
+
+    // find u vector and normalize it
+    this->u = new Vector3f(this->lookat->cross(*this->up));
     this->u->normalize();
 
-    // compute v vector and normalize it
-    this->v = new Vector3f(this->u->cross(*this->alignment));
+    // find v vector and normalize it
+    this->v = new Vector3f(this->u->cross(*this->lookat));
     this->v->normalize();
 
-    //aspect ratio
-    this->aspect = float(this->resolution.width) / float(this->resolution.height);
+    // find alpha
+    this->alpha = float(tan((this->fov * 0.5 )* (M_PI/180)));
 
-    // compute the x and y offset
-    this->xOffset = (2 * tan( this->fov * 0.5f)) / float(this->resolution.height);
-    this->yOffset = (2 * tan( this->fov * 0.5f)) / float(this->resolution.width) * this->aspect;
+    // find the size of one pixel
+    this->s = 2 * this->alpha / float(this->resolution.height);
 
-    cout << "OFFSET x: " << this->xOffset << endl;
-    cout << "OFFSET y: " << this->yOffset << endl;
+    // find the top centre of projection plane
+    this->b = new Vector3f(*this->a + this->alpha * *this->v);
+
+    // find the top left corner of the projection plane
+    this->c = new Vector3f(*this->b - (*this->u * (this->s * float(this->resolution.width)/2)));
 
 }
 
-Ray* Camera::generateRay(float positionX, float positionY) {
+Ray Camera::generateRay(int positionX, int positionY) {
 
-    float xPixelPos = this->position->x() + this->lookat->x() + (this->xOffset * this->u->x());
-    float yPixelPos = this->position->y() + this->lookat->y() + (this->yOffset * this->u->y());
-    float zPixelPos = this->position->z() -1;
+    // width offset
+    Vector3f xOffset = (*this->u * (float(positionX) * this->s + this->s/2));
 
-    Vector3f *rayDirection = new Vector3f(xPixelPos,
-                                          yPixelPos,
-                                          zPixelPos);
+    // height offset
+    Vector3f yOffset = (*this->v * (float(positionY) * this->s + this->s/2));
 
-    Vector3f *rayOrigin = new Vector3f(this->position->x(),
-                                       this->position->y(),
-                                       this->position->z());
+    // direction of the ray
+    Vector3f *rayDirection = new Vector3f(*this->c + xOffset - yOffset);
 
-    // creating a new ray with the right direction
-    return new Ray(rayOrigin, rayDirection);
+    // origin of the ray
+    Vector3f *rayOrigin = new Vector3f(*this->position);
+
+    return {rayOrigin, rayDirection};
+
+}
+
+void Camera::cameraGeometryInfo() {
+
+    cout << "lookat normalized" << endl << *this->lookat << endl;
+
+    cout << "up normalized" << endl << *this->up << endl;
+
+    cout << "Aspect Ratio:" << endl << this->aspectRatio << endl;
+
+    cout << "a: " << endl << *this->a << endl;
+
+    cout << "u:" << endl << *this->u << endl;
+
+    cout << "v:" << endl << *this->v << endl;
+
+    cout << "alpha:" << endl << this->alpha << endl;
+
+    cout << "s: " << endl << this->s << endl;
+
+    cout << "b: " << endl << *this->b << endl;
+
+    cout << "c:" << endl << *this->c << endl;
+
 }
 //------------------

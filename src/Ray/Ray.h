@@ -6,9 +6,13 @@
 #define RAYTRACER_RAY_H
 
 #include <Eigen/Dense>
-#include <ostream>
+#include <iostream>
 
 #include "RGBColor/RGBColor.h"
+
+
+using std::cout;
+using std::endl;
 
 using Eigen::Vector3f;
 
@@ -19,7 +23,7 @@ private:
 
     Vector3f *origin; // origin of the ray
     Vector3f *direction; // direction of the ray
-    Vector3f *beam;
+    Vector3f *beam; // unit vector of the beam of the ray
 
 public:
 
@@ -31,7 +35,7 @@ public:
 
     const Vector3f *getDirection() const{return direction;};
 
-    const Vector3f *getBeam() const {return beam;};
+    const Vector3f *getBeam() const{return beam;};
 
     friend std::ostream &operator<<(std::ostream &os, const Ray &ray);
 

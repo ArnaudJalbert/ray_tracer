@@ -14,7 +14,7 @@ RayTracer::RayTracer(nlohmann::json j) {
 
 int RayTracer::run() {
 
-    this->camera->updateCameraGeometry();
+    this->camera->initCameraGeometry();
 
     this->render();
 
@@ -102,6 +102,8 @@ void RayTracer::createGeometryObjects() {
 
             // adding the sphere to the list
             this->spheres.push_back(sphere);
+
+            cout <<  *sphere << endl;
         }
 
         if(geometry["type"] == "rectangle"){
@@ -229,8 +231,6 @@ void RayTracer::createOutputParameters() {
 
         float fov = output["fov"];
 
-        float aspect = this->resolution.width/ this->resolution.height;
-
         Camera *camera = new Camera(lookat, up, position,
                                     fov, this->resolution.width, this->resolution.height);
 
@@ -245,16 +245,35 @@ void RayTracer::createOutputParameters() {
 bool RayTracer::render() {
 
     // resolution of the image
-    int width = 10;
-    int height = 10;
+    int width = this->resolution.width;
+    int height = this->resolution.height;
+
+    // ppm file creation
+    ofstream outputFile;
+    outputFile.open(this->filename);
+
+    // ppm parameters
+    outputFile << "P3\n" << width << ' ' << height << "\n255\n";
 
     // iterating over all the pixels
-    for(int x = 0; x < width ; ++x){
-        for(int y = 0; y < height; ++y){
-            Ray *ray = this->camera->generateRay(float(x),float(y));
-            cout << *ray << endl;
+    for(int y = 0; y < height ; y++){
+        for(int x = 0; x < width; x++){
+
+            Ray ray = this->camera->generateRay(x,y);
+
+            // checking intersection with spheres
+            for(auto sphere: this->spheres){
+
+                float value = sphere->intersect(&ray);
+                RGBColor color(value, value, value);
+                color.writeColor(outputFile);
+            }
+
         }
     }
 
+    outputFile.close();
+
 }
-//-----------------
+
+

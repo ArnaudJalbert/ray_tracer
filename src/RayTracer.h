@@ -49,8 +49,8 @@ using Eigen::Vector3f;
 #define DEFAULT_HEIGHT 256
 
 // 16:9 ratio
-#define TEST_WIDTH 1920
-#define TEST_HEIGHT 1080
+#define TEST_WIDTH 500
+#define TEST_HEIGHT 500
 #define TEST_ASPECT_RATIO (float(TEST_WIDTH)/float(TEST_HEIGHT))
 
 class RayTracer {

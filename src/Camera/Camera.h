@@ -21,6 +21,8 @@ using std::endl;
 #define DEFAULT_POSITION (new Vector3f(0.0f, 0.0f, 0.0f))
 #define DEFAULT_FOV (60.0f)
 
+#define PLANE_DISTANCE (1.0f)
+
 class Camera {
 
 private:
@@ -36,13 +38,16 @@ private:
 
     float fov; // field of view in degrees -> 0 to 360 degrees
 
-    Vector3f *alignment;
-    Vector3f *u;
-    Vector3f *v;
+    float aspectRatio; // aspectRatio ratio of the screen
 
-    float aspect; // aspect ratio of the screen
-    float xOffset; // offset for x rays
-    float yOffset; // offset for y rays
+    Vector3f *a; // centre of the projection plane
+    Vector3f *b; // top centre of projection plane
+    Vector3f *c; // top left of the projection plane
+    Vector3f *u; // unit vector that gives the direction of the width
+    Vector3f *v; // unit vector that gives the direction of the wheight
+
+    float alpha; // height of half the projection plane
+    float s; // size of a pixel
 
 public:
 
@@ -69,37 +74,36 @@ public:
 
     void setFov(float fov);
 
-    float getAspect() const;
-
-    void setAspect(float aspect);
-
-    Vector3f *getAlignment();
-
-    Vector3f *getUt();
-
-    Vector3f *getV();
     //-------------------
 
     //-------
     // checks
+
     static bool checkFOVRange(float value);
 
     void invalidFOVRange();
+
     //-------
 
     //----------------------
     // operators overloading
+
     friend std::ostream &operator<<(std::ostream &os, const Camera &camera);
+
     //----------------------
 
     //------------------
     // utility functions
 
     // update the camera geometry
-    void updateCameraGeometry();
+    void initCameraGeometry();
 
-    // TODO implement this function
-    Ray *generateRay(float positionX, float positionY);
+    // prints all camera geometry info
+    void cameraGeometryInfo();
+
+    // generates a ray from the camera given an (x,y) pixel position
+    Ray generateRay(int positionX, int positionY);
+
     //------------------
 
 

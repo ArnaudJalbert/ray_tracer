@@ -28,38 +28,20 @@ Sphere::Sphere(float ambientReflection,
                const RGBColor &diffuseColor,
                const RGBColor &specularColor,
                float radius,
-               Vector3f *centre) : Geometry(ambientReflection, diffuseReflection, specularReflection, phongCoefficient, ambientColor, diffuseColor, specularColor){
+               Vector3f *centre)
+               : Geometry(ambientReflection,
+                          diffuseReflection,
+                          specularReflection,
+                          phongCoefficient,
+                          ambientColor,
+                          diffuseColor,
+                          specularColor){
 
     this->setRadius(radius);
     this->setCentre(centre);
 
 }
 //-------------
-
-//--------------------
-// getters and setters
-float Sphere::getRadius() const {
-
-    return radius;
-}
-
-void Sphere::setRadius(float radius) {
-    if(checkRadius(radius)) {
-        this->radius = radius;
-    }
-    else{
-        invalidRadiusSize();
-    }
-}
-
-Vector3f *Sphere::getCentre() const {
-    return centre;
-}
-
-void Sphere::setCentre(Vector3f *centre) {
-    this->centre = centre;
-}
-//--------------------
 
 //-------
 // checks
@@ -79,3 +61,26 @@ std::ostream &operator<<(std::ostream &os, const Sphere &sphere) {
     return os;
 }
 //---------------------
+
+
+
+float Sphere::intersect(Ray *ray) {
+
+    Vector3f *oc = new Vector3f(*ray->getOrigin() - *this->getCentre());
+
+    float a = ray->getBeam()->dot(*ray->getBeam());
+
+    float b = 2.0f * oc->dot(*ray->getBeam());
+
+    float c = oc->dot(*oc) - this->getRadius()* this->getRadius();
+
+    float discriminant = b*b - 4*a*c;
+
+    if(discriminant > 0){
+        return 1;
+    }
+    else{
+        return 0;
+    }
+
+}

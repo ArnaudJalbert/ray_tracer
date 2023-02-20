@@ -6,17 +6,19 @@
 
 Ray::Ray(Vector3f *origin, Vector3f *direction){
 
-    // setting the origin and
+    // setting the origin and direction
     this->origin = origin;
     this->direction = direction;
 
+    // calculating the beam of the ray
     this->beam = new Vector3f(*this->direction - *this->origin);
 
 }
 
 
 std::ostream &operator<<(std::ostream &os, const Ray &ray) {
-    os << "origin: " << *ray.origin << " direction: " << *ray.direction;
+    os << "origin: " << *ray.origin << endl <<
+    " direction: " << *ray.direction << endl;
     return os;
 }
 
