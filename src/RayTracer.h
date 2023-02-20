@@ -49,8 +49,8 @@ using Eigen::Vector3f;
 #define DEFAULT_HEIGHT 256
 
 // 16:9 ratio
-#define TEST_WIDTH 1920
-#define TEST_HEIGHT 1080
+#define TEST_WIDTH 500
+#define TEST_HEIGHT 500
 #define TEST_ASPECT_RATIO (float(TEST_WIDTH)/float(TEST_HEIGHT))
 
 class RayTracer {
@@ -88,8 +88,8 @@ private:
     // filename in which to output the results
     string filename;
 
-    //--------
-    // methods
+    //-------------
+    // JSON parsing
 
     // parse the items in the json object
     void parseItems();
@@ -103,9 +103,15 @@ private:
     // create the light objects
     void createLightObjects();
 
-    // create the ouput parameters
+    // create the output parameters
     void createOutputParameters();
-    //--------
+    //-------------
+
+    //-----------------
+    // render the scene
+    bool render();
+    //-----------------
+
 
 public:
 

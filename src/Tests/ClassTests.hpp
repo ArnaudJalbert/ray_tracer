@@ -18,15 +18,6 @@ using namespace std;
 #define FLOAT_GREATER_1 (1.5f)
 #define FLOAT_LESS_1 (-0.5f)
 
-
-void GeometryTest(){
-    cout << "-------------------" << endl;
-    cout << "Geometry Class Test" << endl;
-    Geometry geoTest = Geometry();
-    cout << geoTest << endl;
-    cout << "-------------------" << endl;
-}
-
 void SphereTest(){
     cout << "------------------" << endl;
     cout << "Sphere Class Test" << endl;
@@ -54,7 +45,6 @@ void LightTest(){
 
 void runTests(){
     cout << "Running Class Tests" << endl;
-    GeometryTest();
     SphereTest();
     RectangleTest();
     LightTest();

@@ -11,6 +11,7 @@
 using std::string;
 
 #include "../RGBColor/RGBColor.h"
+#include "../Ray/Ray.h"
 
 #define DEFAULT_REFLECTION (0.05f)
 #define DEFAULT_PHONG (1.5f)
@@ -39,7 +40,8 @@ public:
     // constructors
     Geometry();
 
-    Geometry(float ambientReflection, float diffuseReflection, float specularReflection, float phongCoefficient, const RGBColor &ambientColor, const RGBColor &diffuseColor, const RGBColor &specularColor);
+    Geometry(float ambientReflection, float diffuseReflection, float specularReflection, float phongCoefficient,
+             const RGBColor &ambientColor, const RGBColor &diffuseColor, const RGBColor &specularColor);
     //-------------
 
     //--------------------
@@ -89,6 +91,10 @@ public:
     friend std::ostream &operator<<(std::ostream &os, const Geometry &geometry);
     //----------------------
 
+    //------------------
+    // utility functions
+    virtual float intersect(Ray* ray) = 0; // to be overwritten by the inherited geometries
+    //------------------
 
 };
 

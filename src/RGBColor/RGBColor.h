@@ -51,10 +51,6 @@ public:
 
     void setB(float b);
 
-
-    /**
-     * @return static float array in the format [R,G,B]
-     */
     float * getRGBArray() const;
     //--------------------
 

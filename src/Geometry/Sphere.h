@@ -40,13 +40,18 @@ public:
 
     //--------------------
     // getters and setters
-    float getRadius() const;
+    float getRadius() const{ return radius;};
 
-    void setRadius(float radius);
+    Vector3f *getCentre() const{ return centre;};
 
-    Vector3f *getCentre() const;
+    void setRadius(float radius){
+        if(checkRadius(radius))
+            this->radius = radius;
+        else
+            invalidRadiusSize();
+    };
 
-    void setCentre(Vector3f *centre);
+    void setCentre(Vector3f *centre){ this->centre = centre;};
     //--------------------
 
     //-------
@@ -61,6 +66,10 @@ public:
     friend std::ostream &operator<<(std::ostream &os, const Sphere &sphere);
     //---------------------
 
+    //------------------
+    // utility functions
+    float intersect(Ray* ray) override;
+    //------------------
 
 
 };

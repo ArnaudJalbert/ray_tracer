@@ -6,41 +6,38 @@
 #define RAYTRACER_RAY_H
 
 #include <Eigen/Dense>
-#include <ostream>
+#include <iostream>
 
 #include "RGBColor/RGBColor.h"
 
-using Eigen::Vector3f;
 
-#define DEFAULT_ORIGIN (Vector3f(0,0,0))
-#define DEFAULT_DIRECTION (Vector3f(0,0,1))
+using std::cout;
+using std::endl;
+
+using Eigen::Vector3f;
 
 
 class Ray {
 
 private:
 
-    Vector3f origin; // origin of the ray
-    Vector3f direction; // direction of the ray
+    Vector3f *origin; // origin of the ray
+    Vector3f *direction; // direction of the ray
+    Vector3f *beam; // unit vector of the beam of the ray
 
 public:
 
     Ray();
 
-    Ray(const Vector3f &origin, const Vector3f &direction);
+    Ray(Vector3f *origin, Vector3f *direction);
 
-    const Vector3f &getOrigin() const;
+    const Vector3f *getOrigin() const{return origin;};
 
-    void setOrigin(const Vector3f &origin);
+    const Vector3f *getDirection() const{return direction;};
 
-    const Vector3f &getDirection() const;
-
-    void setDirection(const Vector3f &direction);
+    const Vector3f *getBeam() const{return beam;};
 
     friend std::ostream &operator<<(std::ostream &os, const Ray &ray);
-
-    // function  𝐏(𝑡)=𝐀+𝑡𝐛
-    Vector3f at(double t);
 
 
 };

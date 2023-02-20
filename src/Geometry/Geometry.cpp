@@ -34,6 +34,7 @@ Geometry::Geometry(float ambientReflection, float diffuseReflection, float specu
 
 //--------------------
 // setters and getters
+
 float Geometry::getAmbientReflection() const {
     return ambientReflection;
 }
@@ -101,10 +102,12 @@ const RGBColor &Geometry::getSpecularColor() const {
 void Geometry::setSpecularColor(const RGBColor &specularColor) {
     this->specularColor = specularColor;
 }
+
 //--------------------
 
 //-------
 // checks
+
 bool Geometry::reflectionCheck(float value) {
     return 0.0f <= value <= 1.0f;
 }
@@ -120,10 +123,12 @@ bool Geometry::phongCheck(float value){
 void Geometry::invalidPhongRange() {
     // TODO add exception or behavior to handle the wrong input, do it for all setter and getters
 }
+
 //-------
 
 //----------------------
 // operators overloading
+
 std::ostream &operator<<(std::ostream &os, const Geometry &geometry) {
     os << "ambientReflection: " << geometry.ambientReflection << " diffuseReflection: " << geometry.diffuseReflection
        << " specularReflection: " << geometry.specularReflection << " phongCoefficient: " << geometry.phongCoefficient
@@ -131,4 +136,29 @@ std::ostream &operator<<(std::ostream &os, const Geometry &geometry) {
        << geometry.specularColor;
     return os;
 }
+
 //----------------------
+
+//------------------
+// utility functions
+
+float vectorDistance( Vector3f *origin, Vector3f *destination){
+
+    float x = destination->x() - origin->x();
+    x = x * x;
+
+    float y = destination->y() - origin->y();
+    y = y * y;
+
+    float z = destination->z() - origin->z();
+    z = z * z;
+
+    float xyz = x + y + z;
+
+    float d = sqrt(xyz );
+
+    return d;
+
+}
+
+//------------------

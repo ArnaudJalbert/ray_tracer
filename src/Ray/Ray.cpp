@@ -4,42 +4,21 @@
 
 #include "Ray.h"
 
-Ray::Ray() {
+Ray::Ray(Vector3f *origin, Vector3f *direction){
 
-    this->setDirection(DEFAULT_DIRECTION);
-    this->setOrigin(DEFAULT_ORIGIN);
-
-}
-
-Ray::Ray(const Vector3f &origin, const Vector3f &direction){
-
-    this->setOrigin(origin);
-    this->setDirection(direction);
-
-}
-
-const Vector3f &Ray::getOrigin() const {
-    return origin;
-}
-
-void Ray::setOrigin(const Vector3f &origin) {
+    // setting the origin and direction
     this->origin = origin;
-}
-
-const Vector3f &Ray::getDirection() const {
-    return direction;
-}
-
-void Ray::setDirection(const Vector3f &direction) {
     this->direction = direction;
+
+    // calculating the beam of the ray
+    this->beam = new Vector3f(*this->direction - *this->origin);
+
 }
+
 
 std::ostream &operator<<(std::ostream &os, const Ray &ray) {
-    os << "origin: " << ray.origin << " direction: " << ray.direction;
+    os << "origin: " << *ray.origin << endl <<
+    " direction: " << *ray.direction << endl;
     return os;
-}
-
-Vector3f Ray::at(double  t){
-    return this->origin + this->direction * t;
 }
 
