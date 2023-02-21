@@ -242,6 +242,19 @@ void RayTracer::createOutputParameters() {
 
 //-----------------
 // render the scene
+bool RayTracer::zTest(Vector3f* point, Vector3f* closestZ){
+
+    // check that it intersected
+    if (point == nullptr || closestZ == nullptr) return false;
+
+    // check if z is closer
+    if (point->z() <= closestZ->z()){
+        return true;
+    }
+
+    return false;
+}
+
 bool RayTracer::render() {
 
     // resolution of the image
@@ -259,15 +272,49 @@ bool RayTracer::render() {
     for(int y = 0; y < height ; y++){
         for(int x = 0; x < width; x++){
 
+            // generating the ray
             Ray ray = this->camera->generateRay(x,y);
+
+            // default color
+            RGBColor color = RGBColor(0, 0, 0);
+
+            Vector3f *closestZ = nullptr;
+
+            // checking intersection with rectangles
+            for(auto rectangle: this->rectangles){
+                Vector3f* point = rectangle->intersect(&ray);
+
+                if (closestZ == nullptr){
+                    closestZ = point;
+                }
+
+                if(zTest(point, closestZ)) {
+
+                    closestZ = point;
+
+                    color = RGBColor(0.5, 0.5, 0.5);
+                }
+            }
 
             // checking intersection with spheres
             for(auto sphere: this->spheres){
 
-                float value = sphere->intersect(&ray);
-                RGBColor color(value, value, value);
-                color.writeColor(outputFile);
+                Vector3f* point = sphere->intersect(&ray);
+
+                if (closestZ == nullptr){
+                    closestZ = point;
+                }
+
+                if(zTest(point, closestZ)) {
+
+                    closestZ = point;
+
+                    color = RGBColor(1, 1, 1);
+                }
+
             }
+
+            color.writeColor(outputFile);
 
         }
     }

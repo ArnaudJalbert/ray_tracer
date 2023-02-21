@@ -44,6 +44,14 @@ Rectangle::Rectangle(float ambientReflection,
                     this->setP2(p2);
                     this->setP3(p3);
                     this->setP4(p4);
+
+                    triangle1.a = p1;
+                    triangle1.b = p2;
+                    triangle1.c = p3;
+
+                    triangle2.a = p3;
+                    triangle2.b = p4;
+                    triangle2.c = p1;
 }
 //-------------
 
@@ -56,6 +64,40 @@ std::ostream &operator<<(std::ostream &os, const Rectangle &rectangle) {
     return os;
 }
 
-float Rectangle::intersect(Ray *ray) {
+// returns the point of intersection
+Vector3f* Rectangle:: findIntersection(struct triangle triangle, Ray *ray){
 
+    Vector3f normal = getNormal(triangle.a, triangle.b, triangle.c);
+
+
+    float t = getT(ray->getOrigin(), triangle.a, ray->getBeam(), &normal);
+
+
+    if ( t >= 0){
+
+        Vector3f *p = new Vector3f(getP(t, ray->getBeam()));
+
+        if(insideTriangle(triangle, p, &normal))
+            return p;
+
+        return nullptr;
+    }
+
+    return nullptr;
+}
+
+Vector3f* Rectangle::intersect(Ray *ray) {
+
+    // check first triangle
+    Vector3f *intersectionPoint = findIntersection(triangle1, ray);
+
+    // check second triangle
+    if (intersectionPoint) return intersectionPoint;
+
+    intersectionPoint = findIntersection(triangle2, ray);
+
+    // check second triangle
+    if (intersectionPoint) return intersectionPoint;
+
+    return nullptr;
 }

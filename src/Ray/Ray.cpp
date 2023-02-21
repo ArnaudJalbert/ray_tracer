@@ -12,6 +12,7 @@ Ray::Ray(Vector3f *origin, Vector3f *direction){
 
     // calculating the beam of the ray
     this->beam = new Vector3f(*this->direction - *this->origin);
+    this->beam->normalize();
 
 }
 
