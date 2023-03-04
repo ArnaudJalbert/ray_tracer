@@ -16,7 +16,7 @@
 
 #include "external/json.hpp"
 #include "external/simpleppm.h"
-#include "src/Tests/ClassTests.hpp"
+#include "ClassTests.hpp"
 
 
 using namespace std;
