@@ -292,7 +292,7 @@ bool RayTracer::render() {
 
                     closestZ = point;
 
-                    color = RGBColor(0.5, 0.5, 0.5);
+                    color = rectangle->getAmbientColor();
                 }
             }
 
@@ -309,7 +309,7 @@ bool RayTracer::render() {
 
                     closestZ = point;
 
-                    color = RGBColor(1, 1, 1);
+                    color = sphere->getAmbientColor();
                 }
 
             }

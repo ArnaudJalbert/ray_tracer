@@ -75,7 +75,7 @@ Vector3f* Rectangle:: findIntersection(struct triangle triangle, Ray *ray){
 
     if ( t >= 0){
 
-        Vector3f *p = new Vector3f(getP(t, ray->getBeam()));
+        Vector3f *p = new Vector3f(getP(t, ray->getBeam(), ray->getOrigin()));
 
         if(insideTriangle(triangle, p, &normal))
             return p;

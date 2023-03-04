@@ -120,9 +120,9 @@ public:
 
     }
 
-    static Vector3f getP(float t, Vector3f *rayBeam){
+    static Vector3f getP(float t, Vector3f *rayBeam, Vector3f *origin){
 
-        Vector3f p = Vector3f(*rayBeam * t);
+        Vector3f p = Vector3f(*origin + *rayBeam * t);
 
         return p;
     }
