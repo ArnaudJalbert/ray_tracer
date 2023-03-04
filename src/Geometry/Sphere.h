@@ -68,7 +68,7 @@ public:
 
     //------------------
     // utility functions
-    float intersect(Ray* ray) override;
+    Vector3f* intersect(Ray* ray) override;
     //------------------
 
 

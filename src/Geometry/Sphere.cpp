@@ -62,25 +62,53 @@ std::ostream &operator<<(std::ostream &os, const Sphere &sphere) {
 }
 //---------------------
 
-
-
-float Sphere::intersect(Ray *ray) {
+Vector3f* Sphere::intersect(Ray *ray) {
 
     Vector3f *oc = new Vector3f(*ray->getOrigin() - *this->getCentre());
 
+    // a -> v.v t^2
     float a = ray->getBeam()->dot(*ray->getBeam());
 
+    // b -> p0 - c * t
     float b = 2.0f * oc->dot(*ray->getBeam());
 
+    // c -> p0-c.p0-c - r^2
     float c = oc->dot(*oc) - this->getRadius()* this->getRadius();
 
-    float discriminant = b*b - 4*a*c;
+    // b^2 - 4ac
+    float discriminant = b * b - 4*a*c;
 
-    if(discriminant > 0){
-        return 1;
+    // no solution
+    if(discriminant <= 0){
+        return nullptr;
     }
-    else{
-        return 0;
+
+    // sqrt(b^2-4ac)
+    discriminant = sqrt(discriminant);
+
+    // -b + sqrt(b^2-4ac) / 2a
+    float t1 = (-b + discriminant) / 2*a;
+
+    // -b - sqrt(b^2-4ac) / 2a
+    float t2 = (-b - discriminant) / 2*a;
+
+    // point 1
+    Vector3f* point1 = new Vector3f( *ray->getBeam() * t1);
+
+    // point 2
+    Vector3f* point2 = new Vector3f( *ray->getBeam() * t2);
+
+
+
+    float p1Dist = vectorDistance(ray->getOrigin(), point1);
+
+    float p2Dist = vectorDistance(ray->getOrigin(), point2);
+
+    // we return the closest point
+    if(p1Dist >= p2Dist) {
+        return point1;
     }
+    else
+        return point2;
 
 }

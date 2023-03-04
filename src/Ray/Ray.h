@@ -31,11 +31,11 @@ public:
 
     Ray(Vector3f *origin, Vector3f *direction);
 
-    const Vector3f *getOrigin() const{return origin;};
+    Vector3f *getOrigin() {return origin;};
 
-    const Vector3f *getDirection() const{return direction;};
+    Vector3f *getDirection() {return direction;};
 
-    const Vector3f *getBeam() const{return beam;};
+    Vector3f *getBeam() {return beam;};
 
     friend std::ostream &operator<<(std::ostream &os, const Ray &ray);
 

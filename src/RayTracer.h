@@ -109,6 +109,8 @@ private:
 
     //-----------------
     // render the scene
+    bool zTest(Vector3f* point, Vector3f* closestZ);
+
     bool render();
     //-----------------
 
