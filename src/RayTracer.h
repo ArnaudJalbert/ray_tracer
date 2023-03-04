@@ -15,21 +15,21 @@
 #include "json.hpp"
 
 // color include
-#include "RGBColor/RGBColor.h"
+#include "RGBColor.h"
 
 // ray include
-#include "Ray/Ray.h"
+#include "Ray.h"
 
 // geometry includes
-#include "Geometry/Sphere.h"
-#include "Geometry/Rectangle.h"
+#include "Sphere.h"
+#include "Rectangle.h"
 
 // lights includes
-#include "Light/PointLight.h"
-#include "Light/AreaLight.h"
+#include "PointLight.h"
+#include "AreaLight.h"
 
 // camera includes
-#include "Camera/Camera.h"
+#include "Camera.h"
 
 
 
