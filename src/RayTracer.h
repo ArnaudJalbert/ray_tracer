@@ -31,6 +31,8 @@
 // camera includes
 #include "Camera.h"
 
+#define HALF_VECTOR Vector3f(0.5f, 0.5f, 0.5f)
+
 
 
 using std::cout;
@@ -109,7 +111,7 @@ private:
 
     //-----------------
     // render the scene
-    bool zTest(Vector3f* point, Vector3f* closestZ);
+    bool distanceTest(Vector3f* point, Vector3f* closest, Vector3f* origin);
 
     bool render();
     //-----------------

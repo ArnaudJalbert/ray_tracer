@@ -242,16 +242,23 @@ void RayTracer::createOutputParameters() {
 
 //-----------------
 // render the scene
-bool RayTracer::zTest(Vector3f* point, Vector3f* closestZ){
+bool RayTracer::distanceTest(Vector3f* point, Vector3f* closest, Vector3f* origin){
 
     // check that it intersected
-    if (point == nullptr || closestZ == nullptr) return false;
+    if (point == nullptr) return false;
+
+    // make sure that the closest point is initialized
+    if (closest == nullptr) closest = point;
 
     // check if z is closer
-    if (point->z() <= closestZ->z()){
+    if (Geometry::vectorDistance(origin, point)
+        <= Geometry::vectorDistance(origin, closest)){
+
+        // the point is closer
         return true;
     }
 
+    // the point is further than the actual closest point
     return false;
 }
 
@@ -280,36 +287,42 @@ bool RayTracer::render() {
 
             Vector3f *closestZ = nullptr;
 
-            // checking intersection with rectangles
-            for(auto rectangle: this->rectangles){
-                Vector3f* point = rectangle->intersect(&ray);
-
-                if (closestZ == nullptr){
-                    closestZ = point;
-                }
-
-                if(zTest(point, closestZ)) {
-
-                    closestZ = point;
-
-                    color = rectangle->getAmbientColor();
-                }
-            }
+//            // checking intersection with rectangles
+//            for(auto rectangle: this->rectangles){
+//                Vector3f* point = rectangle->intersect(&ray);
+//
+//
+//                if(distanceTest(point, closestZ, camera->getPosition())) {
+//
+//                    closestZ = point;
+//
+//                    color = rectangle->getAmbientColor();
+//                }
+//            }
 
             // checking intersection with spheres
             for(auto sphere: this->spheres){
 
-                Vector3f* point = sphere->intersect(&ray);
+                Vector3f* point;
+                // finding the point of intersection
+                point = sphere->intersect(&ray);
 
-                if (closestZ == nullptr){
+                // if the object is the actual closest to the camera then we calculate the shading
+                if(distanceTest(point, closestZ, camera->getPosition())) {
+
+                    // getting the normal of the point
+                    Vector3f* normal = new Vector3f(*point - *sphere->getCentre());
+                    normal->normalize();
+
+                    * normal = *normal * 0.5 + HALF_VECTOR;
+
                     closestZ = point;
-                }
 
-                if(zTest(point, closestZ)) {
+                    color = RGBColor(normal->x(), normal->y(), normal->z());
 
-                    closestZ = point;
+                    delete normal;
 
-                    color = sphere->getAmbientColor();
+                    delete point;
                 }
 
             }

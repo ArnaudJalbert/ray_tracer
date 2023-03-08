@@ -6,8 +6,12 @@
 #define RAYTRACER_LIGHT_H
 
 #include <iostream>
+#include <memory>
 
 #include "RGBColor.h"
+#include "Ray.h"
+#include "Geometry.h"
+
 
 using std::cout;
 using std::endl;
