@@ -3,3 +3,6 @@
 //
 
 #include "PointLight.h"
+
+PointLight::PointLight(const RGBColor &diffuseIntensity, const RGBColor &specularIntensity, Vector3f *centre) : Light(
+        diffuseIntensity, specularIntensity), centre(centre) {}

@@ -181,7 +181,7 @@ void RayTracer::createLightObjects() {
 
             // creating the object
             // TODO put the right instantiation here when light is implemented
-            AreaLight* areaLight = new AreaLight();
+            AreaLight* areaLight = new AreaLight(diffuseIntensity, specularIntensity, p1, p2, p3, p4);
 
             // adding the object to the list
             this->areaLights.push_back(areaLight);
@@ -195,8 +195,7 @@ void RayTracer::createLightObjects() {
                                             light["centre"][2]);
 
             // creating the object
-            // TODO put the right instantiation here when light is implemented
-            PointLight* pointLight = new PointLight();
+            PointLight* pointLight = new PointLight(diffuseIntensity, specularIntensity, centre);
 
             // adding the object to the list
             this->pointLights.push_back(pointLight);
@@ -262,6 +261,51 @@ bool RayTracer::distanceTest(Vector3f* point, Vector3f* closest, Vector3f* origi
     return false;
 }
 
+RGBColor RayTracer::shading(HitPoint* hitPoint) {
+
+    Vector3f lightDirection = *hitPoint->getLight()->getCentre() - *hitPoint->getPoint();
+    lightDirection.normalize();
+
+    float angle = fmax(lightDirection.dot(*hitPoint->getNormal()), 0.0f);
+
+    return RGBColor(angle, angle, angle);
+}
+
+HitPoint RayTracer::intersectSpheres(Ray ray, Vector3f *closest) {
+
+    // checking intersection with spheres
+    for(auto sphere: this->spheres){
+        // finding the point of intersection
+        Vector3f* point = sphere->intersect(&ray);
+
+        HitPoint* hitPoint;
+
+
+        // if the object is the actual closest to the camera then we calculate the shading
+        if(distanceTest(point, closest, camera->getPosition())) {
+
+            closest = point;
+
+            // getting the normal of the point
+            Vector3f* normal = new Vector3f(*point - *sphere->getCentre());
+            normal->normalize();
+
+            hitPoint = new HitPoint(point, normal, nullptr);
+
+            delete normal;
+        }
+
+    }
+
+    return hitPoint;
+}
+
+HitPoint* RayTracer::intersectGeometry(Ray ray, Vector3f *closest) {
+
+    Vector3f* point = intersectSpheres(ray, closest);
+
+
+}
 bool RayTracer::render() {
 
     // resolution of the image
@@ -285,46 +329,12 @@ bool RayTracer::render() {
             // default color
             RGBColor color = RGBColor(0, 0, 0);
 
-            Vector3f *closestZ = nullptr;
+            // this is the closest point to the camera for all intersection
+            Vector3f *closest = nullptr;
 
-            // checking intersection with rectangles
-            for(auto rectangle: this->rectangles){
-                Vector3f* point = rectangle->intersect(&ray);
+            Vector3f* point = intersectGeometry(ray, closest);
 
-                if(distanceTest(point, closestZ, camera->getPosition())) {
 
-                    closestZ = point;
-
-                    color = rectangle->getAmbientColor();
-                }
-            }
-
-            // checking intersection with spheres
-            for(auto sphere: this->spheres){
-
-                Vector3f* point;
-                // finding the point of intersection
-                point = sphere->intersect(&ray);
-
-                // if the object is the actual closest to the camera then we calculate the shading
-                if(distanceTest(point, closestZ, camera->getPosition())) {
-
-                    // getting the normal of the point
-                    Vector3f* normal = new Vector3f(*point - *sphere->getCentre());
-                    normal->normalize();
-
-                    * normal = *normal * 0.5 + HALF_VECTOR;
-
-                    closestZ = point;
-
-                    color = RGBColor(normal->x(), normal->y(), normal->z());
-
-                    delete normal;
-
-                    delete point;
-                }
-
-            }
 
             color.writeColor(outputFile);
 
@@ -335,4 +345,14 @@ bool RayTracer::render() {
 
 }
 
-
+//// checking intersection with rectangles
+//for(auto rectangle: this->rectangles){
+//Vector3f* point = rectangle->intersect(&ray);
+//
+//if(distanceTest(point, closest, camera->getPosition())) {
+//
+//closest = point;
+//
+//color = rectangle->getAmbientColor();
+//}
+//}

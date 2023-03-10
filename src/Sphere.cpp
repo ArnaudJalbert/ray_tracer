@@ -103,7 +103,7 @@ Vector3f* Sphere::intersect(Ray *ray) {
 
     float p2Dist = vectorDistance(ray->getOrigin(), point2);
 
-//     we return the closest point
+    // we return the closest point
     if(p1Dist <= p2Dist) {
         return point1;
     }

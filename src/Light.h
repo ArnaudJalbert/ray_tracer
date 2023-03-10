@@ -36,13 +36,14 @@ public:
 
     //--------------------
     // setters and getters
-    const RGBColor &getDiffuseIntensity() const;
+    const RGBColor &getDiffuseIntensity() const{return diffuseIntensity;}
 
-    void setDiffuseIntensity(const RGBColor &diffuseIntensity);
+    void setDiffuseIntensity(const RGBColor &diffuseIntensity){this->diffuseIntensity = diffuseIntensity;}
 
-    const RGBColor &getSpecularIntensity() const;
+    const RGBColor &getSpecularIntensity() const{return specularIntensity;};
 
-    void setSpecularIntensity(const RGBColor &specularIntensity);
+    void setSpecularIntensity(const RGBColor &specularIntensity){this->specularIntensity = specularIntensity;};
+
     //--------------------
 
     //----------------------

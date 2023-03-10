@@ -21,24 +21,6 @@ Light::Light(const RGBColor &diffuseIntensity, const RGBColor &specularIntensity
 }
 //-------------
 
-//--------------------
-// setters and getters
-const RGBColor &Light::getDiffuseIntensity() const {
-    return diffuseIntensity;
-}
-
-void Light::setDiffuseIntensity(const RGBColor &diffuseIntensity) {
-    this->diffuseIntensity = diffuseIntensity;
-}
-
-const RGBColor &Light::getSpecularIntensity() const {
-    return specularIntensity;
-}
-
-void Light::setSpecularIntensity(const RGBColor &specularIntensity) {
-    this->specularIntensity = specularIntensity;
-}
-//--------------------
 
 //----------------------
 // operators overloading
