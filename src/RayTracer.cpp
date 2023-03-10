@@ -287,18 +287,17 @@ bool RayTracer::render() {
 
             Vector3f *closestZ = nullptr;
 
-//            // checking intersection with rectangles
-//            for(auto rectangle: this->rectangles){
-//                Vector3f* point = rectangle->intersect(&ray);
-//
-//
-//                if(distanceTest(point, closestZ, camera->getPosition())) {
-//
-//                    closestZ = point;
-//
-//                    color = rectangle->getAmbientColor();
-//                }
-//            }
+            // checking intersection with rectangles
+            for(auto rectangle: this->rectangles){
+                Vector3f* point = rectangle->intersect(&ray);
+
+                if(distanceTest(point, closestZ, camera->getPosition())) {
+
+                    closestZ = point;
+
+                    color = rectangle->getAmbientColor();
+                }
+            }
 
             // checking intersection with spheres
             for(auto sphere: this->spheres){
