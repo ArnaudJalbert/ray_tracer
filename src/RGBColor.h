@@ -51,6 +51,8 @@ public:
 
     void setB(float b);
 
+    void setRGB(float r, float g, float b);;
+
     float * getRGBArray() const;
     //--------------------
 
@@ -80,7 +82,7 @@ public:
 
     //------------------
     // utility functions
-    void writeColor(std::ostream &out) const;
+    void writeColor(std::ostream &out);
     //------------------
 };
 

@@ -56,6 +56,8 @@ void RGBColor::setB(float b) {
     else{invalidRGBRange();}
 }
 
+void RGBColor::setRGB(float r, float g, float b) { this->r = r; this->g = g; this->b = b;}
+
 float * RGBColor::getRGBArray() const {
     static float rgbArray[3];
     rgbArray[0] = getR();
@@ -113,9 +115,15 @@ RGBColor operator*(const RGBColor &v, float t) {
 //----------------------
 
 
-void RGBColor::writeColor(std::ostream &out) const{
+void RGBColor::writeColor(std::ostream &out){
     // Write the translated [0,255] value of each color component.
+
+    if (this->r > 1.0f) this->r = 1.0f;
+    if (this->g > 1.0f) this->g = 1.0f;
+    if (this->b > 1.0f) this->b = 1.0f;
+
     out << static_cast<int>(255.999 * this->r) << ' '
         << static_cast<int>(255.999 * this->g) << ' '
         << static_cast<int>(255.999 * this->b) << '\n';
 }
+

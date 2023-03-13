@@ -28,5 +28,8 @@ std::ostream &operator<<(std::ostream &os, const Light &light) {
     os << "diffuseIntensity: " << light.diffuseIntensity << " specularIntensity: " << light.specularIntensity;
     return os;
 }
+
+Light::Light(const RGBColor &diffuseIntensity, const RGBColor &specularIntensity, Vector3f *centre) : diffuseIntensity(
+        diffuseIntensity), specularIntensity(specularIntensity), centre(centre) {}
 //----------------------
 

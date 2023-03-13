@@ -112,16 +112,15 @@ private:
 
     //-----------------
     // render the scene
-    bool distanceTest(Vector3f* point, Vector3f* closest, Vector3f* origin);
+    bool distanceTest(Vector3f* point, HitPoint* closest, Vector3f* origin);
 
-    RGBColor shading(HitPoint* point);
+    void shading(HitPoint* point, RGBColor* color);
 
+    bool intersectSpheres(Ray ray, HitPoint* closest);
 
-    HitPoint intersectSpheres(Ray ray, Vector3f* closest);
+    bool intersectRectangle(Ray ray, HitPoint* closest);
 
-    Vector3f* intersectRectangle(Ray ray, Vector3f* closest);
-
-    HitPoint* intersectGeometry(Ray ray, Vector3f* closest);
+    bool intersectGeometry(Ray ray, HitPoint* closest);
 
     bool render();
     //-----------------

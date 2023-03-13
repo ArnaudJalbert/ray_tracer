@@ -201,6 +201,8 @@ void RayTracer::createLightObjects() {
             this->pointLights.push_back(pointLight);
         }
     }
+
+
 }
 
 void RayTracer::createOutputParameters() {
@@ -241,17 +243,17 @@ void RayTracer::createOutputParameters() {
 
 //-----------------
 // render the scene
-bool RayTracer::distanceTest(Vector3f* point, Vector3f* closest, Vector3f* origin){
+bool RayTracer::distanceTest(Vector3f* point, HitPoint* closest, Vector3f* origin){
 
     // check that it intersected
     if (point == nullptr) return false;
 
     // make sure that the closest point is initialized
-    if (closest == nullptr) closest = point;
+    if (closest->getPoint() == nullptr) closest->setPoint(point);
 
     // check if z is closer
     if (Geometry::vectorDistance(origin, point)
-        <= Geometry::vectorDistance(origin, closest)){
+        <= Geometry::vectorDistance(origin, closest->getPoint())){
 
         // the point is closer
         return true;
@@ -261,51 +263,154 @@ bool RayTracer::distanceTest(Vector3f* point, Vector3f* closest, Vector3f* origi
     return false;
 }
 
-RGBColor RayTracer::shading(HitPoint* hitPoint) {
+void RayTracer::shading(HitPoint* hitPoint, RGBColor* color) {
 
-    Vector3f lightDirection = *hitPoint->getLight()->getCentre() - *hitPoint->getPoint();
-    lightDirection.normalize();
+    // geometry properties
+    Geometry* geo = hitPoint->getGeo();
 
-    float angle = fmax(lightDirection.dot(*hitPoint->getNormal()), 0.0f);
+    // light properties
+    PointLight* pointLight = hitPoint->getLight();
 
-    return RGBColor(angle, angle, angle);
+    // ray properties
+    Ray* ray = hitPoint->getRay();
+
+    // normal of the point
+    Vector3f N = *hitPoint->getNormal();
+
+    RGBColor diffuse = RGBColor(0,0,0);
+
+    RGBColor specular = RGBColor(0,0,0);
+
+    for(auto light: pointLights){
+
+        // light direction
+        Vector3f L = *pointLight->getCentre() - *hitPoint->getPoint();
+        L.normalize();
+
+        // reflected ray
+        Vector3f R = (2 * (N.dot(L))) * N - L;
+        R.normalize();
+
+        // vector to viewer
+        Vector3f V = - Vector3f(-ray->getBeam()->x(), ray->getBeam()->y(), ray->getBeam()->z());
+        V.normalize();
+
+        float diffuseCoefficient = fmax(0.0f, N.dot(L));
+
+        diffuse = diffuse + (diffuseCoefficient * pointLight->getDiffuseIntensity() * geo->getDiffuseColor());
+
+        float specularCoefficient = fmax(R.dot(L), 0.0f);
+
+        specularCoefficient = pow(specularCoefficient, geo->getPhongCoefficient());
+
+        specular = specular + (specularCoefficient * pointLight->getSpecularIntensity() * geo->getSpecularColor());
+    }
+
+    for(auto light: areaLights){
+
+        // light direction
+        Vector3f L = *pointLight->getCentre() - *hitPoint->getPoint();
+        L.normalize();
+
+        // reflected ray
+        Vector3f R = (2 * (N.dot(L))) * N - L;
+        R.normalize();
+
+        // vector to viewer
+        Vector3f V = - Vector3f(-ray->getBeam()->x(), ray->getBeam()->y(), ray->getBeam()->z());
+        V.normalize();
+
+        float diffuseCoefficient = fmax(0.0f, N.dot(L));
+
+        diffuse = diffuse + (diffuseCoefficient * pointLight->getDiffuseIntensity() * geo->getDiffuseColor());
+
+        float specularCoefficient = fmax(R.dot(L), 0.0f);
+
+        specularCoefficient = pow(specularCoefficient, geo->getPhongCoefficient());
+
+        specular = specular + (specularCoefficient * pointLight->getSpecularIntensity() * geo->getSpecularColor());
+    }
+
+
+    // ambient lighting
+    RGBColor ambient = geo->getAmbientReflection() * geo->getAmbientColor();
+
+    *color = ambient+diffuse+specular;
+
 }
 
-HitPoint RayTracer::intersectSpheres(Ray ray, Vector3f *closest) {
+bool RayTracer::intersectSpheres(Ray ray, HitPoint *closest) {
+
+    // check if we intersected something
+    bool intersected = false;
 
     // checking intersection with spheres
     for(auto sphere: this->spheres){
         // finding the point of intersection
         Vector3f* point = sphere->intersect(&ray);
 
-        HitPoint* hitPoint;
-
-
         // if the object is the actual closest to the camera then we calculate the shading
-        if(distanceTest(point, closest, camera->getPosition())) {
+        if(distanceTest(point, closest, ray.getOrigin())) {
 
-            closest = point;
+            intersected = true;
+
+            closest->setPoint(point);
+
+            closest->setGeo(sphere);
 
             // getting the normal of the point
             Vector3f* normal = new Vector3f(*point - *sphere->getCentre());
             normal->normalize();
 
-            hitPoint = new HitPoint(point, normal, nullptr);
+            closest->setNormal(normal);
 
-            delete normal;
         }
 
     }
 
-    return hitPoint;
-}
-
-HitPoint* RayTracer::intersectGeometry(Ray ray, Vector3f *closest) {
-
-    Vector3f* point = intersectSpheres(ray, closest);
-
+    return intersected;
 
 }
+
+bool RayTracer::intersectRectangle(Ray ray, HitPoint *closest) {
+
+    bool intersected = false;
+
+    // checking intersection with rectangles
+    for(auto rectangle: this->rectangles){
+
+        Vector3f* point = rectangle->intersect(&ray);
+
+        if(distanceTest(point, closest, camera->getPosition())) {
+
+            intersected = true;
+
+            closest->setPoint(point);
+
+            closest->setGeo(rectangle);
+
+            Vector3f *normal = new Vector3f(Rectangle::getNormal(rectangle->getP1(),
+                                                                 rectangle->getP2(),
+                                                                 rectangle->getP3()));
+
+            closest->setNormal(normal);
+
+        }
+    }
+
+    return intersected;
+}
+
+bool RayTracer::intersectGeometry(Ray ray, HitPoint *closest) {
+
+    bool intersectedSphere = intersectSpheres(ray, closest);
+
+    bool intersectedRectangle = intersectRectangle(ray, closest);
+
+    return intersectedRectangle || intersectedSphere;
+
+}
+
 bool RayTracer::render() {
 
     // resolution of the image
@@ -327,16 +432,21 @@ bool RayTracer::render() {
             Ray ray = this->camera->generateRay(x,y);
 
             // default color
-            RGBColor color = RGBColor(0, 0, 0);
+            RGBColor *color = new RGBColor(2, 2, 2);
 
             // this is the closest point to the camera for all intersection
-            Vector3f *closest = nullptr;
+            HitPoint *hitPoint = new HitPoint(nullptr, nullptr, nullptr, &ray);
 
-            Vector3f* point = intersectGeometry(ray, closest);
+            bool intersected = intersectGeometry(ray, hitPoint);
 
+            if(intersected) {
 
+                hitPoint->setLight(pointLights[0]);
 
-            color.writeColor(outputFile);
+                shading(hitPoint, color);
+            }
+
+            color->writeColor(outputFile);
 
         }
     }
@@ -344,15 +454,3 @@ bool RayTracer::render() {
     outputFile.close();
 
 }
-
-//// checking intersection with rectangles
-//for(auto rectangle: this->rectangles){
-//Vector3f* point = rectangle->intersect(&ray);
-//
-//if(distanceTest(point, closest, camera->getPosition())) {
-//
-//closest = point;
-//
-//color = rectangle->getAmbientColor();
-//}
-//}

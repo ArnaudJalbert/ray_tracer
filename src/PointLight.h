@@ -16,9 +16,7 @@ public:
 
     PointLight(const RGBColor &diffuseIntensity, const RGBColor &specularIntensity, Vector3f *centre);
 
-    Vector3f *getCentre() const{ return this->centre;}
 
-    void setCentre(Vector3f *centre){ this->centre = centre;};
 
 };
 
