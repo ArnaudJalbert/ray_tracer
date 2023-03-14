@@ -22,8 +22,11 @@ class Light {
 
 private:
 
+    Light(const RGBColor &diffuseIntensity, const RGBColor &specularIntensity);
+
     RGBColor diffuseIntensity; // intensity of the diffuse light
     RGBColor specularIntensity; // intensity of the specular light
+    Vector3f* centre;
 
 public:
 
@@ -31,18 +34,24 @@ public:
     // constructors
     Light();
 
-    Light(const RGBColor &diffuseIntensity, const RGBColor &specularIntensity);
+    Light(const RGBColor &diffuseIntensity, const RGBColor &specularIntensity, Vector3f *centre);
     //-------------
 
     //--------------------
     // setters and getters
-    const RGBColor &getDiffuseIntensity() const;
+    const RGBColor &getDiffuseIntensity() const{return diffuseIntensity;}
 
-    void setDiffuseIntensity(const RGBColor &diffuseIntensity);
+    void setDiffuseIntensity(const RGBColor &diffuseIntensity){this->diffuseIntensity = diffuseIntensity;}
 
-    const RGBColor &getSpecularIntensity() const;
+    const RGBColor &getSpecularIntensity() const{return specularIntensity;};
 
-    void setSpecularIntensity(const RGBColor &specularIntensity);
+    void setSpecularIntensity(const RGBColor &specularIntensity){this->specularIntensity = specularIntensity;};
+
+    Vector3f *getCentre() const{ return this->centre;}
+
+    void setCentre(Vector3f *centre){ this->centre = centre;};
+
+
     //--------------------
 
     //----------------------

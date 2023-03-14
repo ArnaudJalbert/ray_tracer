@@ -9,6 +9,15 @@
 
 class PointLight: public Light {
 
+private:
+    Vector3f *centre;
+
+public:
+
+    PointLight(const RGBColor &diffuseIntensity, const RGBColor &specularIntensity, Vector3f *centre);
+
+
+
 };
 
 

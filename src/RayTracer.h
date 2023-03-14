@@ -23,6 +23,7 @@
 // geometry includes
 #include "Sphere.h"
 #include "Rectangle.h"
+#include "HitPoint.h"
 
 // lights includes
 #include "PointLight.h"
@@ -111,7 +112,15 @@ private:
 
     //-----------------
     // render the scene
-    bool distanceTest(Vector3f* point, Vector3f* closest, Vector3f* origin);
+    bool distanceTest(Vector3f* point, HitPoint* closest, Vector3f* origin);
+
+    void shading(HitPoint* point, RGBColor* color);
+
+    bool intersectSpheres(Ray ray, HitPoint* closest);
+
+    bool intersectRectangle(Ray ray, HitPoint* closest);
+
+    bool intersectGeometry(Ray ray, HitPoint* closest);
 
     bool render();
     //-----------------
