@@ -19,8 +19,5 @@ AreaLight::AreaLight(const RGBColor &diffuseIntensity, const RGBColor &specularI
 
     this->setCentre(centre);
 
-
-
-
 }
 

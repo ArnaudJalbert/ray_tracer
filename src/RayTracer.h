@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <random>
 
 #include <Eigen/Dense>
 #include <vector>
@@ -55,6 +56,7 @@ using Eigen::Vector3f;
 #define TEST_WIDTH 500
 #define TEST_HEIGHT 500
 #define TEST_ASPECT_RATIO (float(TEST_WIDTH)/float(TEST_HEIGHT))
+#define INFNTY 999999999999
 
 class RayTracer {
 
@@ -91,6 +93,14 @@ private:
     // filename in which to output the results
     string filename;
 
+    bool globalillum;
+
+    int maxBounces;
+
+    float probterminate;
+
+    RGBColor bgColor;
+
     //-------------
     // JSON parsing
 
@@ -114,13 +124,17 @@ private:
     // render the scene
     bool distanceTest(Vector3f* point, HitPoint* closest, Vector3f* origin);
 
-    void shading(HitPoint* point, RGBColor* color);
+    void localIllumination(HitPoint* point, RGBColor* color);
 
-    bool intersectSpheres(Ray ray, HitPoint* closest);
+    Vector3f randomDirection(Vector3f* normal);
 
-    bool intersectRectangle(Ray ray, HitPoint* closest);
+    void globalIllumination(Ray* ray, RGBColor* color);
 
-    bool intersectGeometry(Ray ray, HitPoint* closest);
+    HitPoint* intersectSpheres(HitPoint* closest);
+
+    HitPoint* intersectRectangle(HitPoint* closest);
+
+    HitPoint* intersectGeometry(HitPoint* closest);
 
     bool render();
     //-----------------

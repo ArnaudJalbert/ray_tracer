@@ -19,8 +19,7 @@ using std::string;
 
 class Geometry {
 
-
-private:
+public:
 
     // reflection coefficients
     float ambientReflection; // float in range[0,1] → ambient reflection coefficient
@@ -33,9 +32,7 @@ private:
     RGBColor ambientColor; // [3 float] that represents a rgb color → ambient color
     RGBColor diffuseColor; // [3 float] that represents a rgb color → diffuse color
     RGBColor specularColor; // [3 float] that represents a rgb color → specular color
-
-public:
-
+    
     //-------------
     // constructors
     Geometry();
