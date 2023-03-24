@@ -102,8 +102,6 @@ void RayTracer::createGeometryObjects() {
 
             // adding the sphere to the list
             this->spheres.push_back(sphere);
-
-            cout <<  *sphere << endl;
         }
 
         if(geometry["type"] == "rectangle"){
@@ -308,7 +306,7 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
         Vector3f V = - Vector3f(hitPoint->point->x(), hitPoint->point->y(), hitPoint->point->z());
         V.normalize();
 
-        Vector3f H = L + V;
+        Vector3f H = L + V/2;
         H.normalize();
 
         float diffuseCoefficient = fmax(0.0f, N.dot(L));
@@ -383,19 +381,25 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
 
 }
 
-Vector3f RayTracer::randomDirection(Vector3f* normal){
-    cout << "yo" << endl;
+Vector3f RayTracer::randomDirection(HitPoint* hitPoint){
 
     static std::default_random_engine e;
-    static std::uniform_real_distribution<> dis(0, 1); // rage 0 - 1
+    static std::uniform_real_distribution<> dis(-1, 1);// range -1 - 1
 
     while (true){
-//        cout << "yo" << endl;
-        Vector3f ray = Vector3f(float(dis(e)),float(dis(e)),float(dis(e)));
-        cout << ray.norm() << endl;
-        if (ray.norm() >= 1) continue;
-//        if (ray.dot(*normal) < 0) continue;
-        return ray.normalized();
+        // random point
+        Vector3f randomPoint = Vector3f(float(dis(e)),float(dis(e)),float(dis(e)));
+
+        // checking if it is in the unit sphere
+        if (randomPoint.norm() >= 1) continue;
+
+        // normalizing it
+        randomPoint.normalize();
+
+        // checking if it is in the hemisphere
+        if (randomPoint.dot(*hitPoint->normal) <= 0) continue;
+
+        return randomPoint;
     }
 }
 
@@ -409,6 +413,8 @@ void RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
 
     int bounces = 0;
 
+    cout << "-------" << endl;
+
     // looping until we reach the max number of bounces
     for(int i = 0; i < maxBounces; i++){
 
@@ -421,19 +427,28 @@ void RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
             // keeping track of the bounces
             bounces++;
 
+            float attenuation = hitPoint.ray->beam->dot(*hitPoint.normal)/(hitPoint.ray->beam->norm() * hitPoint.normal->norm());
+
+            attenuation = fmax(attenuation, 0.0);
+
+            cout << attenuation << endl;
+
             // compute the brdf
-            sumColor = sumColor + hitPoint.geo->ambientColor * hitPoint.geo->ambientReflection;
+            sumColor = sumColor + (hitPoint.geo->diffuseColor * hitPoint.geo->diffuseReflection * attenuation);
 
             // computing the next ray
-            Vector3f direction = randomDirection(hitPoint.normal);
+            Vector3f direction = randomDirection(&hitPoint);
 
-            path =  Ray(hitPoint.point, &direction);
+            delete hitPoint.ray;
+
+            hitPoint.ray =  new Ray(hitPoint.point, &direction);
 
 
-
-        }else{ break; }
+        }else{break;}
 
     }
+
+    cout << "-------" << endl;
 
     // if there is no bounces then we assign the bg color
     if (bounces == 0){
@@ -530,8 +545,8 @@ bool RayTracer::render() {
 
     // iterating over all the pixels
     for(int y = 0; y < height ; y++){
+        cout << y << endl;
         for(int x = 0; x < width; x++){
-            cout << y << endl;
 
             // generating the ray
             Ray *ray = new Ray(this->camera->generateRay(x,y));
@@ -539,7 +554,7 @@ bool RayTracer::render() {
             // default color
             RGBColor *color = new RGBColor(0.5, 0.5, 0.5);
 
-            if (true)
+            if (globalillum)
                 globalIllumination(ray, color);
             else {
 
@@ -556,8 +571,6 @@ bool RayTracer::render() {
 
 
                 delete ray;
-
-                delete color;
 
                 delete hitPoint;
             }

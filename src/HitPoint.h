@@ -19,7 +19,6 @@ public:
     Vector3f* point;
     Vector3f* normal;
     Geometry* geo;
-    PointLight* light;
     bool intersected;
 
     HitPoint(Ray* ray) : ray(ray) {

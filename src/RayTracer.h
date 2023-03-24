@@ -126,7 +126,7 @@ private:
 
     void localIllumination(HitPoint* point, RGBColor* color);
 
-    Vector3f randomDirection(Vector3f* normal);
+    Vector3f randomDirection(HitPoint* hitPoint);
 
     void globalIllumination(Ray* ray, RGBColor* color);
 
