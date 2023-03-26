@@ -32,6 +32,7 @@
 
 // camera includes
 #include "Camera.h"
+#include "Output.h"
 
 #define HALF_VECTOR Vector3f(0.5f, 0.5f, 0.5f)
 
@@ -80,6 +81,11 @@ private:
 
     // point lights
     vector<PointLight*> pointLights;
+
+    // outputs
+    vector<Output*> outputs;
+
+    Output* currentOutput;
 
     // camera of the scene
     Camera* camera;
@@ -134,6 +140,8 @@ private:
 
     bool globalIllumination(Ray* ray, RGBColor* color);
 
+    bool inShadow(HitPoint *hitPoint, Vector3f *lightPosition);
+
     HitPoint* intersectSpheres(HitPoint* closest);
 
     HitPoint* intersectRectangle(HitPoint* closest);
@@ -152,6 +160,7 @@ public:
     // method called in main
     // it's the only method called in main so everything should start from here
     int run();
+
 
 
 };
