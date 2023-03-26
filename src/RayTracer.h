@@ -93,11 +93,13 @@ private:
     // filename in which to output the results
     string filename;
 
-    bool globalillum;
+    bool globalIllum;
 
     int maxBounces;
 
-    float probterminate;
+    float probTerminate;
+
+    float raysPerPixel[2];
 
     RGBColor bgColor;
 
@@ -124,11 +126,13 @@ private:
     // render the scene
     bool distanceTest(Vector3f* point, HitPoint* closest, Vector3f* origin);
 
+    float randomFloat(float base, float offset);
+
     void localIllumination(HitPoint* point, RGBColor* color);
 
-    Vector3f randomDirection(HitPoint* hitPoint);
+    Vector3f randomUnitPoint(HitPoint* hitPoint);
 
-    void globalIllumination(Ray* ray, RGBColor* color);
+    bool globalIllumination(Ray* ray, RGBColor* color);
 
     HitPoint* intersectSpheres(HitPoint* closest);
 

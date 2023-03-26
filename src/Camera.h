@@ -8,6 +8,7 @@
 #include <Eigen/Dense>
 #include <iostream>
 #include <math.h>
+#include <random>
 
 #include "Ray.h"
 
@@ -103,6 +104,9 @@ public:
 
     // generates a ray from the camera given an (x,y) pixel position
     Ray generateRay(int positionX, int positionY);
+
+    // generates a ray from the camera given an (x,y) pixel position with sampling value
+    Ray generateRay(int positionX, int positionY, int samplingX, int samplingY, int size);
 
     //------------------
 

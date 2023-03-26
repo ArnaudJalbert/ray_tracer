@@ -214,9 +214,11 @@ void RayTracer::createOutputParameters() {
         this->filename = output["filename"];
         this->resolution.width = output["size"][0];
         this->resolution.height = output["size"][1];
-        this->globalillum = output["globalillum"];
+        this->globalIllum = output["globalillum"];
         this->maxBounces = output["maxbounces"];
-        this->probterminate = output["probterminate"];
+        this->probTerminate = output["probterminate"];
+        this->raysPerPixel[0] = output["raysperpixel"][0];
+        this->raysPerPixel[1] = output["raysperpixel"][1];
 
         this->bgColor = RGBColor(output["bkc"][0],
                                  output["bkc"][1],
@@ -270,6 +272,17 @@ bool RayTracer::distanceTest(Vector3f* point, HitPoint* closest, Vector3f* origi
     return false;
 }
 
+float RayTracer::randomFloat(float base, float offset){
+
+    std::default_random_engine e;
+    std::uniform_real_distribution<> dis(-1,1); // range -1 - 1
+
+    float num = base * float(dis(e)) + offset;
+
+
+    return num;
+}
+
 void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
 
     // geometry properties
@@ -318,16 +331,6 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
         specularCoefficient = pow(specularCoefficient, geo->getPhongCoefficient());
 
         specular = specular + (specularCoefficient * light->getSpecularIntensity() * geo->getSpecularColor());
-
-        // checking if in shadow
-//        Ray rayToLight = Ray(hitPoint->point, light->getCentre());
-//
-//        if( !ignoreShadows && intersectGeometry(rayToLight, &emptyHitPoint))
-//            shadow = true;
-//        else {
-//            shadow = false;
-//            ignoreShadows = true;
-//        }
 
     }
 
@@ -381,20 +384,20 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
 
 }
 
-Vector3f RayTracer::randomDirection(HitPoint* hitPoint){
+Vector3f RayTracer::randomUnitPoint(HitPoint* hitPoint){
 
     static std::default_random_engine e;
     static std::uniform_real_distribution<> dis(-1, 1);// range -1 - 1
 
     while (true){
+
         // random point
-        Vector3f randomPoint = Vector3f(float(dis(e)),float(dis(e)),float(dis(e)));
+        Vector3f randomPoint = Vector3f(float(dis(e)),
+                                        float(dis(e)),
+                                        float(dis(e)));
 
         // checking if it is in the unit sphere
         if (randomPoint.norm() >= 1) continue;
-
-        // normalizing it
-        randomPoint.normalize();
 
         // checking if it is in the hemisphere
         if (randomPoint.dot(*hitPoint->normal) <= 0) continue;
@@ -403,9 +406,7 @@ Vector3f RayTracer::randomDirection(HitPoint* hitPoint){
     }
 }
 
-void RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
-
-    Ray path = *ray;
+bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
 
     HitPoint hitPoint = HitPoint(ray);
 
@@ -413,10 +414,14 @@ void RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
 
     int bounces = 0;
 
-    cout << "-------" << endl;
-
     // looping until we reach the max number of bounces
     for(int i = 0; i < maxBounces; i++){
+
+        static std::default_random_engine e;
+        static std::uniform_real_distribution<> dis(0, 1);// range -1 - 1
+
+        if (bounces >= 1 && float(dis(e)) > probTerminate) break;
+
 
         // intersecting with the geometries
         intersectGeometry(&hitPoint);
@@ -427,36 +432,69 @@ void RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
             // keeping track of the bounces
             bounces++;
 
-            float attenuation = hitPoint.ray->beam->dot(*hitPoint.normal)/(hitPoint.ray->beam->norm() * hitPoint.normal->norm());
+            float attenuation = hitPoint.ray->beam->dot(*hitPoint.normal);
 
             attenuation = fmax(attenuation, 0.0);
-
-            cout << attenuation << endl;
 
             // compute the brdf
             sumColor = sumColor + (hitPoint.geo->diffuseColor * hitPoint.geo->diffuseReflection * attenuation);
 
             // computing the next ray
-            Vector3f direction = randomDirection(&hitPoint);
+            Vector3f unitPoint = randomUnitPoint(&hitPoint);
+
+            Vector3f direction = *hitPoint.point + unitPoint;
 
             delete hitPoint.ray;
 
             hitPoint.ray =  new Ray(hitPoint.point, &direction);
 
 
-        }else{break;}
+        }else{
+            return false;
+        }
 
     }
-
-    cout << "-------" << endl;
 
     // if there is no bounces then we assign the bg color
     if (bounces == 0){
-        *color = bgColor;
+        return false;
     }
     else{
-        // we go to the light
+
+        // we go to the light(s)
+        for (auto light: pointLights) {
+
+            // light direction
+            Vector3f L = *light->getCentre() - *hitPoint.point;
+            L.normalize();
+
+            // diffuse coefficient
+            float diffuseCoefficient = fmax(0.0f, hitPoint.normal->dot(L));
+
+
+            sumColor = sumColor + (diffuseCoefficient * light->getDiffuseIntensity() * hitPoint.geo->getDiffuseColor());
+
+        }
+
+        // we go to the light(s)
+        for (auto light: areaLights) {
+
+            // light direction
+            Vector3f L = *light->getCentre() - *hitPoint.point;
+            L.normalize();
+
+            // diffuse coefficient
+            float diffuseCoefficient = fmax(0.0f, hitPoint.normal->dot(L));
+
+
+            sumColor = sumColor + (diffuseCoefficient * light->getDiffuseIntensity() * hitPoint.geo->getDiffuseColor());
+
+        }
+
+        // sum up the colors and add the lighting
         *color = sumColor*(1.0f/float(bounces));
+
+        return true;
     }
 
 
@@ -548,37 +586,58 @@ bool RayTracer::render() {
         cout << y << endl;
         for(int x = 0; x < width; x++){
 
-            // generating the ray
-            Ray *ray = new Ray(this->camera->generateRay(x,y));
-
             // default color
             RGBColor *color = new RGBColor(0.5, 0.5, 0.5);
 
-            if (globalillum)
-                globalIllumination(ray, color);
-            else {
+            // total number of ray sample done
+            int totalSamples = 0;
 
-                // this is the closest point to the camera for all intersection
-                HitPoint *hitPoint = new HitPoint(ray);
+            for (int rY = 0; rY < raysPerPixel[0]; ++rY) {
+                for(int rX = 0; rX < raysPerPixel[0]; ++rX) {
 
-                intersectGeometry(hitPoint);
+                    // generating the ray
 
-                if (hitPoint->intersected) {
+                    if (globalIllum) {
 
-                    localIllumination(hitPoint, color);
+                        Ray *ray = new Ray(this->camera->generateRay(x, y, rX, rY, 3));
 
+                        if (globalIllumination(ray, color)) {
+                            totalSamples++;
+                        }
+                    } else {
+
+                        // generating the ray
+                        Ray *ray = new Ray(this->camera->generateRay(x, y));
+
+                        // this is the closest point to the camera for all intersection
+                        HitPoint *hitPoint = new HitPoint(ray);
+
+                        intersectGeometry(hitPoint);
+
+                        if (hitPoint->intersected) {
+
+                            localIllumination(hitPoint, color);
+
+                        }
+
+
+                        delete ray;
+
+                        delete hitPoint;
+                    }
                 }
-
-
-                delete ray;
-
-                delete hitPoint;
             }
+            // averaging the color
+            if (totalSamples > 0 )
+                *color = *color * (1.0f/float(totalSamples));
 
+            // writing color to the file
             color->writeColor(outputFile);
 
+            delete color;
 
         }
+
     }
 
     outputFile.close();
