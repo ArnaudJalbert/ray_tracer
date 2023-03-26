@@ -146,34 +146,16 @@ Ray Camera::generateRay(int positionX, int positionY) {
 
 }
 
-Ray Camera::generateRay(int positionX, int positionY, int samplingX, int samplingY, int size) {
+Ray Camera::generateRay(int positionX, int positionY, float grids, int xPlacement, int yPlacement) {
 
-    // gap
-    float stratifiedGap = this->alpha/float(size);
-
-    // width limits
-    float widthLimit = stratifiedGap * float(samplingX);
-    float widthLimitUpper = widthLimit + stratifiedGap;
-
-    // height limits
-    float heightLimit = stratifiedGap * float(samplingY);
-    float heightLimitUpper = heightLimit + stratifiedGap;
-
-    static std::default_random_engine e;
-    static std::uniform_real_distribution<> disE(widthLimit, widthLimitUpper);
-
-    float samplingOffsetX = float(disE(e));
-
-    static std::default_random_engine f;
-    static std::uniform_real_distribution<> disF(heightLimit, heightLimitUpper);
-
-    float samplingOffsetY = float(disF(f));
+    // new delta
+    float newDelta = this->s/grids;
 
     // width offset
-    Vector3f xOffset = (*this->u * (float(positionX) * this->s + samplingOffsetX));
+    Vector3f xOffset = (*this->u * (float(positionX) * this->s + newDelta/2 * float(xPlacement)));
 
     // height offset
-    Vector3f yOffset = (*this->v * (float(positionY) * this->s + samplingOffsetY));
+    Vector3f yOffset = (*this->v * (float(positionY) * this->s + newDelta/2 * float(yPlacement)));
 
     // direction of the ray
     Vector3f *rayDirection = new Vector3f(*this->c + xOffset - yOffset);

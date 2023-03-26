@@ -87,27 +87,6 @@ private:
 
     Output* currentOutput;
 
-    // camera of the scene
-    Camera* camera;
-
-    // resolution of the image
-    struct resolution{
-        int width;
-        int height;
-    } resolution;
-
-    // filename in which to output the results
-    string filename;
-
-    bool globalIllum;
-
-    int maxBounces;
-
-    float probTerminate;
-
-    float raysPerPixel[2];
-
-    RGBColor bgColor;
 
     //-------------
     // JSON parsing

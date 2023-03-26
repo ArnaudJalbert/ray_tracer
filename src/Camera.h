@@ -106,7 +106,7 @@ public:
     Ray generateRay(int positionX, int positionY);
 
     // generates a ray from the camera given an (x,y) pixel position with sampling value
-    Ray generateRay(int positionX, int positionY, int samplingX, int samplingY, int size);
+    Ray generateRay(int positionX, int positionY, float grids, int xPlacement, int yPlacemen);
 
     //------------------
 

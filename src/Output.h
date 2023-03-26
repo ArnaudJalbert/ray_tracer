@@ -25,6 +25,8 @@ public:
 
     bool globalIllum;
 
+    bool anitAliasing;
+
     int maxBounces;
 
     float probTerminate;
