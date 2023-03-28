@@ -8,64 +8,18 @@
 // constructors
 RGBColor::RGBColor() {
     // black as default
-    this->setR(0.0);
-    this->setG(0.0);
-    this->setB(0.0);
+    r = 0.0;
+    g = 0.0;
+    b = 0.0;
 }
 
 RGBColor::RGBColor(float r, float g, float b){
 
-    this->setR(r);
-    this->setG(g);
-    this->setB(b);
+    this->r = r;
+    this->g = g;
+    this->b = b;
 }
 //-------------
-
-//--------------------
-// setters and getters
-float RGBColor::getR() const {
-    return r;
-}
-
-void RGBColor::setR(float r) {
-    if (rgbRange(r)) {
-        RGBColor::r = r;
-    }
-    else{invalidRGBRange();}
-}
-
-float RGBColor::getG() const {
-    return g;
-}
-
-void RGBColor::setG(float g) {
-    if (rgbRange(g)) {
-        RGBColor::g = g;
-    }
-    else{invalidRGBRange();}
-}
-
-float RGBColor::getB() const {
-    return this->b;
-}
-
-void RGBColor::setB(float b) {
-    if (rgbRange(b)) {
-        RGBColor::b = b;
-    }
-    else{invalidRGBRange();}
-}
-
-void RGBColor::setRGB(float r, float g, float b) { this->r = r; this->g = g; this->b = b;}
-
-float * RGBColor::getRGBArray() const {
-    static float rgbArray[3];
-    rgbArray[0] = getR();
-    rgbArray[1] = getG();
-    rgbArray[2] = getB();
-    return rgbArray;
-}
-//--------------------
 
 //-------
 // checks

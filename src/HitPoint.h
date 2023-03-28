@@ -27,16 +27,8 @@ public:
         intersected = false;
     }
 
-    void setPoint(Vector3f *point){ this->point = point;};
-
-    void setNormal(Vector3f *normal){ this->normal = normal;};
-
-    void setGeo(Geometry* geo) { this->geo = geo;};
-
-    void setRay(Ray* ray) { this->ray = ray;};
-
     friend std::ostream &operator<<(std::ostream &os, const HitPoint &point) {
-        os << "ray: " << *point.ray << " point: " << *point.point << " normal: " << *point.normal << " geo: " << *point.geo
+        os << "ray: " << point.ray << " point: " << *point.point << " normal: " << *point.normal << " geo: " << *point.geo
            << " intersected: " << point.intersected;
         return os;
     }

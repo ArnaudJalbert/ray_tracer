@@ -12,15 +12,13 @@
 using std::string;
 
 class RGBColor {
+public:
 
-private:
     // 3 float values that represent a RBG color
     // all values are in range [0,1]
     float r; // red
     float g; // green
     float b; // blue
-
-public:
 
     //-------------
     // constructors
@@ -36,25 +34,6 @@ public:
      */
     virtual ~RGBColor() = default;
     //----------
-
-    //--------------------
-    // setters and getters
-    float getR() const;
-
-    void setR(float r);
-
-    float getG() const;
-
-    void setG(float g);
-
-    float getB() const;
-
-    void setB(float b);
-
-    void setRGB(float r, float g, float b);;
-
-    float * getRGBArray() const;
-    //--------------------
 
     //-------
     // checks

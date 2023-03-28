@@ -16,7 +16,6 @@
 
 #include "external/json.hpp"
 #include "external/simpleppm.h"
-#include "ClassTests.hpp"
 
 
 using namespace std;
@@ -35,8 +34,6 @@ int main(int argc, char* argv[])
         test_eigen();
         test_save_ppm();
 
-        // CUSTOM TESTS. TO BE REMOVED
-        runTests();
         
     } else {
         

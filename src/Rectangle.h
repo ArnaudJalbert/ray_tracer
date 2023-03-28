@@ -20,9 +20,9 @@ using Eigen::Vector3f;
 #define DEFAULT_P4 (new Vector3f(1.0f, 1.0f, 1.0f))
 
 struct triangle{
-    Vector3f *a;
-    Vector3f *b;
-    Vector3f *c;
+    Vector3f a;
+    Vector3f b;
+    Vector3f c;
 };
 
 
@@ -32,10 +32,10 @@ class Rectangle: public Geometry{
 
 public:
 
-    Vector3f* p1; // coordinates of point #1
-    Vector3f* p2; // coordinates of point #2
-    Vector3f* p3; // coordinates of point #3
-    Vector3f* p4; // coordinates of point #4
+    Vector3f p1; // coordinates of point #1
+    Vector3f p2; // coordinates of point #2
+    Vector3f p3; // coordinates of point #3
+    Vector3f p4; // coordinates of point #4
 
     struct triangle triangle1;
     struct triangle triangle2;
@@ -46,34 +46,13 @@ public:
     // constructors
     Rectangle();
 
-    Rectangle(Vector3f *p1, Vector3f *p2, Vector3f *p3, Vector3f *p4);
+    Rectangle(Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4);
 
     Rectangle(float ambientReflection, float diffuseReflection, float specularReflection, float phongCoefficient,
               const RGBColor &ambientColor, const RGBColor &diffuseColor, const RGBColor &specularColor,
-              Vector3f *p1, Vector3f *p2, Vector3f *p3, Vector3f *p4);
+              Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4);
 
     //-------------
-
-    //--------------------
-    // getters and setters
-
-    void setP1(Vector3f *p1){ this->p1 = p1; };
-
-    void setP2(Vector3f *p2){ this->p2 = p2; };
-
-    void setP3(Vector3f *p3){ this->p3 = p3; };
-
-    void setP4(Vector3f *p4){ this->p4 = p4; };
-
-    Vector3f *getP1() const{ return p1; };
-
-    Vector3f *getP2() const{ return p2; };
-
-    Vector3f *getP3() const{ return p3; };
-
-    Vector3f *getP4() const{ return p4; };
-
-    //--------------------
 
     //---------------------
     // operator overloading
@@ -143,14 +122,14 @@ public:
 
     static bool insideTriangle(struct triangle triangle, Vector3f* p, Vector3f *normal){
 
-        Vector3f sbcNormal = getNormal(triangle.b, triangle.a, triangle.c);
-        int sbc = sign(triangle.b, triangle.c, p, normal);
+        Vector3f sbcNormal = getNormal(&triangle.b, &triangle.a, &triangle.c);
+        int sbc = sign(&triangle.b, &triangle.c, p, normal);
 
-        Vector3f scaNormal = getNormal(triangle.c, triangle.a, triangle.b);
-        int sca = sign(triangle.c, triangle.a, p, normal);
+        Vector3f scaNormal = getNormal(&triangle.c, &triangle.a, &triangle.b);
+        int sca = sign(&triangle.c, &triangle.a, p, normal);
 
-        Vector3f sabNormal = getNormal(triangle.a, triangle.c, triangle.b);
-        int sab = sign(triangle.a, triangle.b, p, normal);
+        Vector3f sabNormal = getNormal(&triangle.a, &triangle.c, &triangle.b);
+        int sab = sign(&triangle.a, &triangle.b, p, normal);
 
         return sbc == 1 && sca == 1 && sab == 1;
     }

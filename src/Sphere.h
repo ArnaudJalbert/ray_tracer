@@ -20,15 +20,11 @@ using Eigen::Vector3f;
 // Sphere is a type of geometry
 class Sphere : public Geometry{
 
-private:
-
+public:
+    
     float radius; // size of the radius of the sphere
     Vector3f centre; // centre of the sphere in 3d space
 
-public:
-
-    //-------------
-    // constructors
     Sphere();
 
     Sphere(float radius, Vector3f centre);
@@ -36,30 +32,11 @@ public:
     Sphere(float ambientReflection, float diffuseReflection, float specularReflection, float phongCoefficient,
            const RGBColor &ambientColor, const RGBColor &diffuseColor, const RGBColor &specularColor, float radius,
            Vector3f centre);
-    //-------------
 
-    //--------------------
-    // getters and setters
-    float getRadius() const{ return radius;};
-
-    Vector3f getCentre() const{ return centre;};
-
-    void setRadius(float radius){
-        if(checkRadius(radius))
-            this->radius = radius;
-        else
-            invalidRadiusSize();
-    };
+    void setRadius(float radius){ this->radius = radius; };
 
     void setCentre(Vector3f centre){ this->centre = centre;};
     //--------------------
-
-    //-------
-    // checks
-    static bool checkRadius(float radius);
-
-    void invalidRadiusSize();
-    //-------
 
     //---------------------
     // operator overloading

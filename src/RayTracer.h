@@ -109,7 +109,7 @@ private:
 
     //-----------------
     // render the scene
-    bool distanceTest(Vector3f* point, HitPoint* closest, Vector3f* origin);
+    bool distanceTest(Vector3f* point, HitPoint* closest);
 
     float randomFloat(float base, float offset);
 
@@ -135,6 +135,8 @@ public:
 
     // constructor called in main
     explicit RayTracer(nlohmann::json j);
+
+    ~RayTracer() = default;
 
     // method called in main
     // it's the only method called in main so everything should start from here

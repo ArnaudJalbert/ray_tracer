@@ -35,53 +35,10 @@ public:
     
     //-------------
     // constructors
-    Geometry();
 
     Geometry(float ambientReflection, float diffuseReflection, float specularReflection, float phongCoefficient,
              const RGBColor &ambientColor, const RGBColor &diffuseColor, const RGBColor &specularColor);
     //-------------
-
-    //--------------------
-    // setters and getters
-    float getAmbientReflection() const;
-
-    void setAmbientReflection(float ambientReflection);
-
-    float getDiffuseReflection() const;
-
-    void setDiffuseReflection(float diffuseReflection);
-
-    float getSpecularReflection() const;
-
-    void setSpecularReflection(float specularReflection);
-
-    float getPhongCoefficient() const;
-
-    void setPhongCoefficient(float phongCoefficient);
-
-    const RGBColor &getAmbientColor() const;
-
-    void setAmbientColor(const RGBColor &ambientColor);
-
-    const RGBColor &getDiffuseColor() const;
-
-    void setDiffuseColor(const RGBColor &diffuseColor);
-
-    const RGBColor &getSpecularColor() const;
-
-    void setSpecularColor(const RGBColor &specularColor);
-    //--------------------
-
-    //-------
-    // checks
-    static bool reflectionCheck(float value);
-
-    void invalidReflectionRange();
-
-    static bool phongCheck(float value);
-
-    void invalidPhongRange();
-    //-------
 
     //----------------------
     // operators overloading
@@ -90,7 +47,7 @@ public:
 
     //------------------
     // utility functions
-    static float vectorDistance( Vector3f *origin, Vector3f *destination );
+    static float vectorDistance(Vector3f origin, Vector3f destination );
 
     virtual Vector3f* intersect(Ray* ray) = 0; // to be overwritten by the inherited geometries
     //------------------

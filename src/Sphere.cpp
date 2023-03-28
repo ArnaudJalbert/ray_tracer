@@ -6,20 +6,6 @@
 
 //-------------
 // constructors
-Sphere::Sphere() {
-
-    this->setRadius(DEFAULT_RADIUS);
-    this->setCentre(DEFAULT_CENTRE);
-
-}
-
-Sphere::Sphere(float radius, Vector3f centre){
-
-    this->setRadius(radius);
-    this->setCentre(centre);
-
-}
-
 Sphere::Sphere(float ambientReflection,
                float diffuseReflection,
                float specularReflection,
@@ -41,18 +27,6 @@ Sphere::Sphere(float ambientReflection,
     this->setCentre(centre);
 
 }
-//-------------
-
-//-------
-// checks
-bool Sphere::checkRadius(float radius){
-    return radius > 0.0f;
-}
-
-void Sphere::invalidRadiusSize() {
-    // TODO add exception or behavior to handle the wrong input for Radius
-}
-//-------
 
 //---------------------
 // operator overloading
@@ -64,16 +38,16 @@ std::ostream &operator<<(std::ostream &os, const Sphere &sphere) {
 
 Vector3f* Sphere::intersect(Ray *ray) {
 
-    Vector3f *sphereCentre = new Vector3f(*ray->getOrigin() - this->getCentre());
+    Vector3f sphereCentre = Vector3f(ray->origin - this->centre);
 
     // a -> v.v t^2
-    float a = ray->getBeam()->dot(*ray->getBeam());
+    float a = ray->beam.dot(ray->beam);
 
     // b -> p0 - c * t
-    float b = 2.0f * sphereCentre->dot(*ray->getBeam());
+    float b = 2.0f * sphereCentre.dot(ray->beam);
 
     // c -> p0-c.p0-c - r^2
-    float c = sphereCentre->dot(*sphereCentre) - this->getRadius() * this->getRadius();
+    float c = sphereCentre.dot(sphereCentre) - this->radius * this->radius;
 
     // b^2 - 4ac
     float discriminant = (b * b) - (4 * a * c);
@@ -93,15 +67,15 @@ Vector3f* Sphere::intersect(Ray *ray) {
     float t2 = (-b - discriminant) / (2*a);
 
     // point 1
-    Vector3f* point1 = new Vector3f( *ray->getOrigin() + (*ray->getBeam() * t1));
+    Vector3f* point1 = new Vector3f( ray->origin + (ray->beam * t1));
 
     // point 2
-    Vector3f* point2 = new Vector3f( *ray->getOrigin() + (*ray->getBeam() * t2));
+    Vector3f* point2 = new Vector3f( ray->origin + (ray->beam * t2));
 
     // distance from the points to the camera
-    float p1Dist = vectorDistance(ray->getOrigin(), point1);
+    float p1Dist = vectorDistance(ray->origin, *point1);
 
-    float p2Dist = vectorDistance(ray->getOrigin(), point2);
+    float p2Dist = vectorDistance(ray->origin, *point2);
 
     // we return the closest point
     if(p1Dist <= p2Dist) {
