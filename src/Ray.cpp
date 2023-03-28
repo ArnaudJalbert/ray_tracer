@@ -4,6 +4,8 @@
 
 #include "Ray.h"
 
+
+
 Ray::Ray(Vector3f *origin, Vector3f *direction){
 
     // setting the origin and direction
@@ -23,4 +25,6 @@ std::ostream &operator<<(std::ostream &os, const Ray &ray) {
     "beam: " << *ray.beam << endl;
     return os;
 }
+
+Ray::Ray() {}
 

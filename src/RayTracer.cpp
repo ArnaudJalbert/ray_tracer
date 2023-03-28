@@ -340,7 +340,7 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
         Vector3f V = - Vector3f(hitPoint->point->x(), hitPoint->point->y(), hitPoint->point->z());
         V.normalize();
 
-        Vector3f H = L + V;
+        Vector3f H = (L + V )/ Geometry::vectorDistance(&V, &L);;
         H.normalize();
 
         float diffuseCoefficient = fmax(0.0f, N.dot(L));
@@ -375,7 +375,7 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
         Vector3f V = - Vector3f(-ray->getBeam()->x(), ray->getBeam()->y(), ray->getBeam()->z());
         V.normalize();
 
-        Vector3f H = (V + L);
+        Vector3f H = (V + L) / Geometry::vectorDistance(&V, &L);
 
         float diffuseCoefficient = fmax(0.0f, N.dot(L));
 
@@ -389,7 +389,6 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
 
         if (inShadow(hitPoint, light->getCentre()))
             shadow = true;
-
     }
 
 
@@ -400,8 +399,6 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
         *color = ambient+diffuse * 0.5;
     else
         *color = ambient+diffuse+specular;
-
-
 
 }
 
@@ -421,9 +418,11 @@ Vector3f RayTracer::randomUnitPoint(HitPoint* hitPoint){
         if (randomPoint.norm() >= 1) continue;
 
         // checking if it is in the hemisphere
-        if (randomPoint.normalized().dot(*hitPoint->normal) <= 0) continue;
-
-        return randomPoint;
+        if (randomPoint.dot(*hitPoint->normal) > 0) {
+            return randomPoint;
+        }
+        else
+            return -randomPoint;
     }
 }
 
@@ -457,7 +456,7 @@ bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
 
             float attenuation = hitPoint.normal->dot(*hitPoint.ray->beam);
 
-            attenuation = fmax(attenuation, 0.0);
+            attenuation = fmax(attenuation, 0.5);
 
             // compute the brdf
             sumColor = sumColor + (hitPoint.geo->diffuseColor * hitPoint.geo->diffuseReflection * attenuation);
@@ -467,11 +466,10 @@ bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
 
             Vector3f direction = *hitPoint.point + unitPoint;
 
-            delete hitPoint.ray;
-
             hitPoint.ray =  new Ray(hitPoint.point, &direction);
 
             hitPoint.intersected = false;
+
 
 
         }else{
@@ -511,13 +509,12 @@ bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
             // diffuse coefficient
             float diffuseCoefficient = fmax(0.0f, hitPoint.normal->dot(L));
 
-
             sumColor = sumColor + (diffuseCoefficient * light->getDiffuseIntensity() * hitPoint.geo->getDiffuseColor());
 
         }
 
         // sum up the colors and add the lighting
-        *color = sumColor*(1.0f/float(bounces));
+        *color = sumColor * (1.0f / float(bounces));
 
         return true;
     }
