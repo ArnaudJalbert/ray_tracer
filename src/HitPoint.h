@@ -22,6 +22,8 @@ public:
     Geometry* geo;
     bool intersected;
 
+    HitPoint() {}
+
     HitPoint(Ray* ray) : ray(ray) {
         point = nullptr;
         intersected = false;

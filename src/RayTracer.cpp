@@ -424,14 +424,31 @@ Vector3f RayTracer::randomUnitPoint(HitPoint* hitPoint){
         // checking if it is in the unit sphere
         if (randomPoint.norm() >= 1) continue;
 
-        // checking if it is in the hemisphere
-        if (randomPoint.dot(*hitPoint->normal) > 0) {
-            return randomPoint;
-        }
-        else
-            return -randomPoint;
+        return randomPoint;
     }
 }
+
+//
+//Vector3f RayTracer::randomUnitPoint() {
+//
+//    float x;
+//    float y;
+//    float z;
+//
+//    while (true) {
+//        srand(time(0));
+//        x = (rand() / (RAND_MAX + 1.0)) * 2 - 1;
+//        srand(time(0));
+//        y = (rand() / (RAND_MAX + 1.0)) * 2 - 1;
+//
+//        if (x * x + y * y < 1) {
+//            z = sqrt(1 - x * x - y * y);
+//            break;
+//        }
+//    }
+//
+//    return Vector3f(x, y, z);
+//}
 
 bool RayTracer::globalIllumination(Ray* ray, RGBColor *color) {
 
@@ -443,9 +460,7 @@ bool RayTracer::globalIllumination(Ray* ray, RGBColor *color) {
 
     bool noBounce = false;
 
-    for (int j = 0; j < 4; ++j) {
-
-        bounces++;
+    for (int j = 0; j < currentOutput->maxBounces; ++j) {
 
         intersectGeometry(&currentHit);
 
@@ -594,7 +609,7 @@ bool RayTracer::render() {
 
     // iterating over all the pixels
     for(int y = 0; y < height ; y++){
-//        cout << y << endl;
+        cout << y << endl;
         for(int x = 0; x < width; x++){
 
             // default color
@@ -611,9 +626,6 @@ bool RayTracer::render() {
                 // iterating over the samples in the pixel
                 for (int i = 0; i < currentOutput->raysPerPixel[0]; i++) {
                     for (int j = 0; j < currentOutput->raysPerPixel[1]; j++) {
-//                        for (int l = 0; l < currentOutput->raysPerPixel[0]; ++l) {
-
-
                             // generating a new ray
                             Ray *ray = new Ray(
                                     currentOutput->camera->generateRay(x, y, currentOutput->raysPerPixel[0], i + 1,
@@ -622,7 +634,6 @@ bool RayTracer::render() {
                                 sumColor = sumColor + color;
                                 totalSamples++;
                             }
-//                        }
                     }
                 }
             }
