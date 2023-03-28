@@ -293,8 +293,8 @@ bool RayTracer::distanceTest(Vector3f* point, HitPoint* closest){
     if (closest->point == nullptr) closest->point = point;
 
     // check if z is closer
-    if (Geometry::vectorDistance(closest->ray->origin, *point)
-        <= Geometry::vectorDistance(closest->ray->origin, *closest->point)){
+    if (Geometry::vectorDistance(*closest->ray->origin, *point)
+        <= Geometry::vectorDistance(*closest->ray->origin, *closest->point)){
 
         // the point is closer
         return true;
@@ -342,7 +342,7 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
         L.normalize();
 
         // vector to viewer
-        Vector3f V = - Vector3f(ray->beam.x(), ray->beam.y(), ray->beam.z());
+        Vector3f V = - Vector3f(ray->beam->x(), ray->beam->y(), ray->beam->z());
         V.normalize();
 
         Vector3f H = (L + V);
@@ -361,7 +361,6 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
         // check if it's in shadow
         if (inShadow(hitPoint, light->centre)) {
             shadow = true;
-            shadowAttenutation -= 0.5;
         }
 
 
@@ -379,7 +378,7 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
         R.normalize();
 
         // vector to viewer
-        Vector3f V = - Vector3f(-ray->beam.x(), ray->beam.y(), ray->beam.z());
+        Vector3f V = - Vector3f(ray->beam->x(), ray->beam->y(), ray->beam->z());
         V.normalize();
 
         Vector3f H = (V + L);
@@ -403,9 +402,9 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
     // ambient lighting
     RGBColor ambient = geo->ambientReflection * geo->ambientColor;
 
-    if (shadow)
-        *color = ambient+diffuse * shadowAttenutation;
-    else
+//    if (shadow)
+//        *color = ambient+diffuse * shadowAttenutation;
+//    else
         *color = ambient+diffuse+specular;
 
 }
@@ -436,89 +435,64 @@ Vector3f RayTracer::randomUnitPoint(HitPoint* hitPoint){
 
 bool RayTracer::globalIllumination(Ray* ray, RGBColor *color) {
 
-    HitPoint hitPoint = HitPoint(ray);
+    HitPoint currentHit = HitPoint(ray);
 
-    RGBColor sumColor = RGBColor();
+    RGBColor sumColor = RGBColor(0,0,0);
 
     int bounces = 0;
 
-    // looping until we reach the max number of bounces or the prob of termination
-    for(int i = 0; i < currentOutput->maxBounces; i++){
+    bool noBounce = false;
 
-        // random number
-        static std::default_random_engine e;
-        static std::uniform_real_distribution<> dis(0, 1);// range -1 - 1
+    for (int j = 0; j < 4; ++j) {
 
-        // check probability
-//        if (bounces >= 1 && float(dis(e)) > currentOutput->probTerminate) break;
+        bounces++;
 
-        // intersecting with the geometries
-        intersectGeometry(&hitPoint);
+        intersectGeometry(&currentHit);
 
-        // check if we intersected
-        if (hitPoint.intersected){
+        if (currentHit.intersected){
 
-            // keeping track of the bounces
-            bounces++;
+            // point lights
+            for(auto light: pointLights){
 
-            // compute the brdf
-            sumColor = sumColor + (hitPoint.geo->diffuseColor * hitPoint.geo->diffuseReflection);
+                // light direction
+                Vector3f L = *light->centre - *currentHit.point;
+                L.normalize();
 
-            // computing the next ray
-            Vector3f unitPoint = randomUnitPoint(&hitPoint);
+                float diffuseCoefficient = fmax(0.0f, currentHit.normal->dot(L));
 
-            Vector3f direction = *hitPoint.point + unitPoint;
+                sumColor = sumColor + (diffuseCoefficient * light->diffuseIntensity * currentHit.geo->diffuseColor);
 
-            hitPoint.ray =  new Ray(*hitPoint.point, direction);
+            }
 
-        }else{
-            return false;
+            // area lights
+            for(auto light: areaLights){
+
+                // light direction
+                Vector3f L = *light->centre - *currentHit.point;
+                L.normalize();
+
+                float diffuseCoefficient = fmax(0.0f, currentHit.normal->dot(L));
+
+                sumColor = sumColor + (diffuseCoefficient * light->diffuseIntensity * currentHit.geo->diffuseColor);
+            }
+
+            Vector3f* point = new Vector3f(randomUnitPoint(&currentHit));
+
+            Vector3f* hemPoint = new Vector3f(*currentHit.point + *point);
+
+            currentHit.ray = new Ray(point, hemPoint);
         }
-
+        else{
+            noBounce = true;
+            break;
+        }
     }
 
-    // if there is no bounces then we assign the bg color
-    if (bounces == 0){
-        return false;
-    }
-    else{
-
-        // we go to the light(s)
-        for (auto light: pointLights) {
-
-            // light direction
-            Vector3f L = *light->centre - *hitPoint.point;
-            L.normalize();
-
-            // diffuse coefficient
-            float diffuseCoefficient = fmax(0.0f, hitPoint.normal->dot(L));
-
-
-            sumColor = sumColor + (diffuseCoefficient * light->diffuseIntensity * hitPoint.geo->diffuseColor);
-
-        }
-
-        // we go to the light(s)
-        for (auto light: areaLights) {
-
-            // light direction
-            Vector3f L = *light->centre - *hitPoint.point;
-            L.normalize();
-
-            // diffuse coefficient
-            float diffuseCoefficient = fmax(0.0f, hitPoint.normal->dot(L));
-
-            sumColor = sumColor + (diffuseCoefficient * light->diffuseIntensity * hitPoint.geo->diffuseColor);
-
-        }
-
-        // sum up the colors and add the lighting
-        *color = sumColor * (1.0f / float(bounces));
-
+    if (!noBounce) {
+        *color = sumColor * (1 / float(bounces));
         return true;
     }
-
-
+    return false;
 
 }
 
@@ -526,7 +500,7 @@ bool RayTracer::inShadow(HitPoint* hitPoint, Vector3f *lightPosition){
 
     Vector3f rayToLight = *lightPosition - *hitPoint->point;
 
-    Ray shadowRay = Ray(*hitPoint->point, *lightPosition);
+    Ray shadowRay = Ray(hitPoint->point, lightPosition);
 
     HitPoint shadowIntersection = HitPoint(&shadowRay);
 
@@ -637,12 +611,18 @@ bool RayTracer::render() {
                 // iterating over the samples in the pixel
                 for (int i = 0; i < currentOutput->raysPerPixel[0]; i++) {
                     for (int j = 0; j < currentOutput->raysPerPixel[1]; j++) {
-                        // generating a new ray
-                        Ray* ray = new Ray(currentOutput->camera->generateRay(x, y, currentOutput->raysPerPixel[0], i+1, j+1));
-                        if (globalIllumination(ray, &color)) {
-                            sumColor = sumColor + color;
-                            totalSamples++;
-                        }
+//                        for (int l = 0; l < currentOutput->raysPerPixel[0]; ++l) {
+
+
+                            // generating a new ray
+                            Ray *ray = new Ray(
+                                    currentOutput->camera->generateRay(x, y, currentOutput->raysPerPixel[0], i + 1,
+                                                                       j + 1));
+                            if (globalIllumination(ray, &color)) {
+                                sumColor = sumColor + color;
+                                totalSamples++;
+                            }
+//                        }
                     }
                 }
             }

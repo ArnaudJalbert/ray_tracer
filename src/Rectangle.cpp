@@ -56,12 +56,12 @@ Vector3f* Rectangle:: findIntersection(struct triangle triangle, Ray *ray){
     Vector3f normal = getNormal(&triangle.a, &triangle.b, &triangle.c);
 
 
-    float t = getT(&ray->origin, &triangle.a, &ray->beam, &normal);
+    float t = getT(ray->origin, &triangle.a, ray->beam, &normal);
 
 
     if ( t >= 0){
 
-        Vector3f *p = new Vector3f(getP(t, &ray->beam, &ray->origin));
+        Vector3f *p = new Vector3f(getP(t, ray->beam, ray->origin));
 
         if(insideTriangle(triangle, p, &normal))
             return p;

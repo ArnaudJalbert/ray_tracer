@@ -88,10 +88,10 @@ Ray Camera::generateRay(int positionX, int positionY) {
     Vector3f yOffset = (this->v * (float(positionY) * this->s + this->s/2));
 
     // direction of the ray
-    Vector3f rayDirection = Vector3f(this->c + xOffset - yOffset);
+    Vector3f* rayDirection = new Vector3f(this->c + xOffset - yOffset);
 
     // origin of the ray
-    Vector3f rayOrigin = Vector3f(this->position);
+    Vector3f* rayOrigin = new Vector3f(this->position);
 
     return {rayOrigin, rayDirection};
 
@@ -109,10 +109,10 @@ Ray Camera::generateRay(int positionX, int positionY, float grids, int xPlacemen
     Vector3f yOffset = (this->v * (float(positionY) * this->s + newDelta/2 * float(yPlacement)));
 
     // direction of the ray
-    Vector3f rayDirection = Vector3f(this->c + xOffset - yOffset);
+    Vector3f* rayDirection = new Vector3f(this->c + xOffset - yOffset);
 
     // origin of the ray
-    Vector3f rayOrigin = Vector3f(this->position);
+    Vector3f* rayOrigin = new Vector3f(this->position);
 
     return {rayOrigin, rayDirection};
 

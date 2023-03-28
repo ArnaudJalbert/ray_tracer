@@ -6,15 +6,15 @@
 
 
 
-Ray::Ray(Vector3f origin, Vector3f direction){
+Ray::Ray(Vector3f *origin, Vector3f *direction){
 
     // setting the origin and direction
     this->origin = origin;
     this->direction = direction;
 
     // calculating the beam of the ray
-    this->beam = Vector3f(this->direction - this->origin);
-    this->beam.normalize();
+    this->beam = new Vector3f(*this->direction - *this->origin);
+    this->beam->normalize();
 
 }
 
