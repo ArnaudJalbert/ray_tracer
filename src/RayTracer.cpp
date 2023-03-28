@@ -21,7 +21,6 @@ int RayTracer::run() {
         this->render();
     }
 
-
     return 1;
 }
 
@@ -88,9 +87,9 @@ void RayTracer::createGeometryObjects() {
         if(geometry["type"] == "sphere"){
 
             // creating the four points
-            Vector3f* centre = new Vector3f(geometry["centre"][0],
-                                            geometry["centre"][1],
-                                            geometry["centre"][2]);
+            Vector3f centre = Vector3f(geometry["centre"][0],
+                                       geometry["centre"][1],
+                                       geometry["centre"][2]);
 
             // getting the radius
             float radius = geometry["radius"];
@@ -217,12 +216,19 @@ void RayTracer::createOutputParameters() {
         Output* newOutput = new Output();
 
         // ray tracer parameters
+        // file outputs
         newOutput->filename = output["filename"];
+
+        // resolution
         newOutput->resolution.width = output["size"][0];
         newOutput->resolution.height = output["size"][1];
+
+        // background color
         newOutput->bgColor = RGBColor(output["bkc"][0],
                                  output["bkc"][1],
                                  output["bkc"][2]);
+
+        // ambient intensity
         // optional parameters
         try {
             newOutput->globalIllum = output["globalillum"];
@@ -325,6 +331,8 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
 
     bool shadow = false;
 
+    float shadowAttenutation = 1.0f;
+
     // point lights
     for(auto light: pointLights){
 
@@ -337,10 +345,10 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
         R.normalize();
 
         // vector to viewer
-        Vector3f V = - Vector3f(hitPoint->point->x(), hitPoint->point->y(), hitPoint->point->z());
+        Vector3f V = - Vector3f(hitPoint->ray->beam->x(), hitPoint->ray->beam->y(), hitPoint->ray->beam->z());
         V.normalize();
 
-        Vector3f H = (L + V )/ Geometry::vectorDistance(&V, &L);;
+        Vector3f H = (L + V);
         H.normalize();
 
         float diffuseCoefficient = fmax(0.0f, N.dot(L));
@@ -354,9 +362,11 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
         specular = specular + (specularCoefficient * light->getSpecularIntensity() * geo->getSpecularColor());
 
         // check if it's in shadow
-        HitPoint shadowDistance = HitPoint(ray);
-        if (inShadow(hitPoint, light->getCentre()))
+        if (inShadow(hitPoint, light->getCentre())) {
             shadow = true;
+            shadowAttenutation -= 0.5;
+        }
+
 
     }
 
@@ -375,20 +385,21 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
         Vector3f V = - Vector3f(-ray->getBeam()->x(), ray->getBeam()->y(), ray->getBeam()->z());
         V.normalize();
 
-        Vector3f H = (V + L) / Geometry::vectorDistance(&V, &L);
+        Vector3f H = (V + L);
 
         float diffuseCoefficient = fmax(0.0f, N.dot(L));
 
         diffuse = diffuse + (diffuseCoefficient * light->getDiffuseIntensity() * geo->getDiffuseColor());
 
-        float specularCoefficient = fmax(R.dot(H), 0.0f);
+        float specularCoefficient = fmax(N.dot(H), 0.0f);
 
         specularCoefficient = pow(specularCoefficient, geo->getPhongCoefficient());
 
         specular = specular + (specularCoefficient * light->getSpecularIntensity() * geo->getSpecularColor());
 
-        if (inShadow(hitPoint, light->getCentre()))
+        if (inShadow(hitPoint, light->getCentre())) {
             shadow = true;
+        }
     }
 
 
@@ -396,7 +407,7 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
     RGBColor ambient = geo->getAmbientReflection() * geo->getAmbientColor();
 
     if (shadow)
-        *color = ambient+diffuse * 0.5;
+        *color = ambient+diffuse * shadowAttenutation;
     else
         *color = ambient+diffuse+specular;
 
@@ -442,8 +453,7 @@ bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
         static std::uniform_real_distribution<> dis(0, 1);// range -1 - 1
 
         // check probability
-        if (bounces >= 1 && float(dis(e)) > currentOutput->probTerminate) break;
-
+//        if (bounces >= 1 && float(dis(e)) > currentOutput->probTerminate) break;
 
         // intersecting with the geometries
         intersectGeometry(&hitPoint);
@@ -454,12 +464,8 @@ bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
             // keeping track of the bounces
             bounces++;
 
-            float attenuation = hitPoint.normal->dot(*hitPoint.ray->beam);
-
-            attenuation = fmax(attenuation, 0.5);
-
             // compute the brdf
-            sumColor = sumColor + (hitPoint.geo->diffuseColor * hitPoint.geo->diffuseReflection * attenuation);
+            sumColor = sumColor + (hitPoint.geo->diffuseColor * hitPoint.geo->diffuseReflection);
 
             // computing the next ray
             Vector3f unitPoint = randomUnitPoint(&hitPoint);
@@ -467,10 +473,6 @@ bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
             Vector3f direction = *hitPoint.point + unitPoint;
 
             hitPoint.ray =  new Ray(hitPoint.point, &direction);
-
-            hitPoint.intersected = false;
-
-
 
         }else{
             return false;
@@ -525,11 +527,9 @@ bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
 
 bool RayTracer::inShadow(HitPoint* hitPoint, Vector3f *lightPosition){
 
-    Vector3f epsilonPoint = *hitPoint->point;
+    Vector3f rayToLight = *lightPosition - *hitPoint->point;
 
-    Vector3f rayToLight = *lightPosition - epsilonPoint;
-
-    Ray shadowRay = Ray(&epsilonPoint, &rayToLight);
+    Ray shadowRay = Ray(hitPoint->point, lightPosition);
 
     HitPoint shadowIntersection = HitPoint(&shadowRay);
 
@@ -558,7 +558,7 @@ HitPoint* RayTracer::intersectSpheres(HitPoint *closest) {
             closest->geo = sphere;
 
             // getting the normal of the point
-            Vector3f *normal = new Vector3f(*point - *sphere->getCentre());
+            Vector3f *normal = new Vector3f(*point - sphere->getCentre());
             normal->normalize();
 
             closest->normal = normal;
@@ -623,7 +623,7 @@ bool RayTracer::render() {
 
     // iterating over all the pixels
     for(int y = 0; y < height ; y++){
-        cout << y << endl;
+//        cout << y << endl;
         for(int x = 0; x < width; x++){
 
             // default color
@@ -654,11 +654,11 @@ bool RayTracer::render() {
 
                 if (currentOutput->anitAliasing){
                     // iterating over the samples in the pixel
-                    for (int i = 0; i < currentOutput->raysPerPixel[0]; i++) {
-                        for (int j = 0; j < currentOutput->raysPerPixel[0]; j++) {
+                    for (int i = 0; i < currentOutput->n; i++) {
+                        for (int j = 0; j < currentOutput->n; j++) {
 
                             // generating a new ray
-                            Ray *ray = new Ray(currentOutput->camera->generateRay(x, y, currentOutput->raysPerPixel[0], i+1, j+1));
+                            Ray *ray = new Ray(currentOutput->camera->generateRay(x, y, currentOutput->n, i+1, j+1));
 
                             // this is the closest point to the camera for all intersection
                             HitPoint *hitPoint = new HitPoint(ray);
@@ -666,7 +666,6 @@ bool RayTracer::render() {
                             intersectGeometry(hitPoint);
 
                             if (hitPoint->intersected) {
-
                                 localIllumination(hitPoint, color);
 
                                 sumColor = sumColor + *color;

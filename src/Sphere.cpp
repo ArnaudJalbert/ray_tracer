@@ -13,7 +13,7 @@ Sphere::Sphere() {
 
 }
 
-Sphere::Sphere(float radius, Vector3f *centre){
+Sphere::Sphere(float radius, Vector3f centre){
 
     this->setRadius(radius);
     this->setCentre(centre);
@@ -28,7 +28,7 @@ Sphere::Sphere(float ambientReflection,
                const RGBColor &diffuseColor,
                const RGBColor &specularColor,
                float radius,
-               Vector3f *centre)
+               Vector3f centre)
                : Geometry(ambientReflection,
                           diffuseReflection,
                           specularReflection,
@@ -57,14 +57,14 @@ void Sphere::invalidRadiusSize() {
 //---------------------
 // operator overloading
 std::ostream &operator<<(std::ostream &os, const Sphere &sphere) {
-    os << static_cast<const Geometry &>(sphere) << " radius: " << sphere.radius << " centre: " << endl << *sphere.centre;
+    os << static_cast<const Geometry &>(sphere) << " radius: " << sphere.radius << " centre: " << endl << sphere.centre;
     return os;
 }
 //---------------------
 
 Vector3f* Sphere::intersect(Ray *ray) {
 
-    Vector3f *sphereCentre = new Vector3f(*ray->getOrigin() - *this->getCentre());
+    Vector3f *sphereCentre = new Vector3f(*ray->getOrigin() - this->getCentre());
 
     // a -> v.v t^2
     float a = ray->getBeam()->dot(*ray->getBeam());

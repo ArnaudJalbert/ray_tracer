@@ -23,15 +23,17 @@ public:
     // filename in which to output the results
     string filename;
 
-    bool globalIllum;
+    bool globalIllum = false;
 
-    bool anitAliasing;
+    bool anitAliasing = false;
 
     int maxBounces;
 
     float probTerminate;
 
-    float raysPerPixel[2];
+    float raysPerPixel[3];
+
+    float n;
 
     RGBColor bgColor;
 
