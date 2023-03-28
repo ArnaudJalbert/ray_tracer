@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <random>
 
 #include <Eigen/Dense>
 #include <vector>
@@ -31,6 +32,7 @@
 
 // camera includes
 #include "Camera.h"
+#include "Output.h"
 
 #define HALF_VECTOR Vector3f(0.5f, 0.5f, 0.5f)
 
@@ -55,6 +57,7 @@ using Eigen::Vector3f;
 #define TEST_WIDTH 500
 #define TEST_HEIGHT 500
 #define TEST_ASPECT_RATIO (float(TEST_WIDTH)/float(TEST_HEIGHT))
+#define INFNTY 999999999999
 
 class RayTracer {
 
@@ -79,17 +82,11 @@ private:
     // point lights
     vector<PointLight*> pointLights;
 
-    // camera of the scene
-    Camera* camera;
+    // outputs
+    vector<Output*> outputs;
 
-    // resolution of the image
-    struct resolution{
-        int width;
-        int height;
-    } resolution;
+    Output* currentOutput;
 
-    // filename in which to output the results
-    string filename;
 
     //-------------
     // JSON parsing
@@ -114,13 +111,21 @@ private:
     // render the scene
     bool distanceTest(Vector3f* point, HitPoint* closest, Vector3f* origin);
 
-    void shading(HitPoint* point, RGBColor* color);
+    float randomFloat(float base, float offset);
 
-    bool intersectSpheres(Ray ray, HitPoint* closest);
+    void localIllumination(HitPoint* point, RGBColor* color);
 
-    bool intersectRectangle(Ray ray, HitPoint* closest);
+    Vector3f randomUnitPoint(HitPoint* hitPoint);
 
-    bool intersectGeometry(Ray ray, HitPoint* closest);
+    bool globalIllumination(Ray* ray, RGBColor* color);
+
+    bool inShadow(HitPoint *hitPoint, Vector3f *lightPosition);
+
+    HitPoint* intersectSpheres(HitPoint* closest);
+
+    HitPoint* intersectRectangle(HitPoint* closest);
+
+    HitPoint* intersectGeometry(HitPoint* closest);
 
     bool render();
     //-----------------
@@ -134,6 +139,7 @@ public:
     // method called in main
     // it's the only method called in main so everything should start from here
     int run();
+
 
 
 };

@@ -146,6 +146,27 @@ Ray Camera::generateRay(int positionX, int positionY) {
 
 }
 
+Ray Camera::generateRay(int positionX, int positionY, float grids, int xPlacement, int yPlacement) {
+
+    // new delta
+    float newDelta = this->s/grids;
+
+    // width offset
+    Vector3f xOffset = (*this->u * (float(positionX) * this->s + newDelta/2 * float(xPlacement)));
+
+    // height offset
+    Vector3f yOffset = (*this->v * (float(positionY) * this->s + newDelta/2 * float(yPlacement)));
+
+    // direction of the ray
+    Vector3f *rayDirection = new Vector3f(*this->c + xOffset - yOffset);
+
+    // origin of the ray
+    Vector3f *rayOrigin = new Vector3f(*this->position);
+
+    return {rayOrigin, rayDirection};
+
+}
+
 void Camera::cameraGeometryInfo() {
 
     cout << "lookat normalized" << endl << *this->lookat << endl;

@@ -6,6 +6,7 @@
 #define RAYTRACER_HITPOINT_H
 
 #include <Eigen/Dense>
+#include <ostream>
 #include "PointLight.h"
 
 using Eigen::Vector3f;
@@ -13,38 +14,32 @@ using Eigen::Vector3f;
 
 class HitPoint {
 
-private:
-    Vector3f* point = nullptr;
-    Vector3f* normal;
-    Geometry* geo;
-    PointLight* light;
-    Ray* ray;
-
 public:
 
-    HitPoint(Vector3f *point, Vector3f *normal, PointLight *light, Ray* ray) : point(point), normal(normal), light(light), ray(ray) {}
+    Ray* ray;
+    Vector3f* point;
+    Vector3f* normal;
+    Geometry* geo;
+    bool intersected;
 
-    Vector3f *getPoint() const{return point;};
+    HitPoint(Ray* ray) : ray(ray) {
+        point = nullptr;
+        intersected = false;
+    }
 
     void setPoint(Vector3f *point){ this->point = point;};
 
-    Vector3f *getNormal() const{return normal;};
-
     void setNormal(Vector3f *normal){ this->normal = normal;};
-
-    PointLight *getLight() const{return light;};
-
-    void setLight(PointLight *light){this->light = light;};
-
-    Geometry* getGeo() const {return geo;};
 
     void setGeo(Geometry* geo) { this->geo = geo;};
 
-    Ray* getRay() const {return ray;};
-
     void setRay(Ray* ray) { this->ray = ray;};
 
-
+    friend std::ostream &operator<<(std::ostream &os, const HitPoint &point) {
+        os << "ray: " << *point.ray << " point: " << *point.point << " normal: " << *point.normal << " geo: " << *point.geo
+           << " intersected: " << point.intersected;
+        return os;
+    }
 
 };
 

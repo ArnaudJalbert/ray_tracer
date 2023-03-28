@@ -30,7 +30,7 @@ struct triangle{
 // Rectangle is a type of geometry
 class Rectangle: public Geometry{
 
-private:
+public:
 
     Vector3f* p1; // coordinates of point #1
     Vector3f* p2; // coordinates of point #2

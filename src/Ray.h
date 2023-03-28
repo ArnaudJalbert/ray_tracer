@@ -19,13 +19,11 @@ using Eigen::Vector3f;
 
 class Ray {
 
-private:
+public:
 
     Vector3f *origin; // origin of the ray
     Vector3f *direction; // direction of the ray
     Vector3f *beam; // unit vector of the beam of the ray
-
-public:
 
     Ray();
 

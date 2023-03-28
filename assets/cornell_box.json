@@ -165,9 +165,9 @@
 
             "ka":0,
             "kd":1,
-            "ks":1,
+            "ks":0,
 
-            "pc":5,
+            "pc":0,
 
             "visible": true
 
@@ -336,7 +336,7 @@
         }
     ],
     "output":[{
-        "filename":"cornel_box.ppm",
+        "filename":"cornell_box.ppm",
         "size":[500,500],
         "lookat":[0,0,-1],
         "up":[0,1,0],
@@ -346,7 +346,7 @@
         "bkc":[0.5,0.5,0.5],
 
         "globalillum": true,
-        "raysperpixel": [10, 10],
+        "raysperpixel": [4,4],
         "maxbounces": 3,
         "probterminate": 0.333
     }
