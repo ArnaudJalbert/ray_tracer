@@ -437,6 +437,24 @@ Vector3f RayTracer::randomUnitPoint(HitPoint* hitPoint){
     }
 }
 
+Vector3f randomHem(){
+    float x;
+    float y;
+    float z;
+
+    while (true){
+        x = (rand() / (RAND_MAX + 1.0))*2 -1;
+        y = (rand() / (RAND_MAX + 1.0))*2 -1;
+
+        if(x*x + y*y < 1){
+            z = sqrt(1-x*x-y*y);
+            break;
+        }
+    }
+
+    return Vector3f(x,y,z);
+}
+
 bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
 
     HitPoint hitPoint = HitPoint(ray);
@@ -464,15 +482,47 @@ bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
             // keeping track of the bounces
             bounces++;
 
-            // compute the brdf
-            sumColor = sumColor + (hitPoint.geo->diffuseColor * hitPoint.geo->diffuseReflection);
+            // we go to the light(s)
+            for (auto light: pointLights) {
 
-            // computing the next ray
-            Vector3f unitPoint = randomUnitPoint(&hitPoint);
+                // light direction
+                Vector3f L = *light->getCentre() - *hitPoint.point;
+                L.normalize();
 
-            Vector3f direction = *hitPoint.point + unitPoint;
+                // diffuse coefficient
+                float diffuseCoefficient = fmax(0.0f, hitPoint.normal->dot(L));
 
-            hitPoint.ray =  new Ray(hitPoint.point, &direction);
+
+                sumColor = sumColor + (diffuseCoefficient * light->getDiffuseIntensity() * hitPoint.geo->getDiffuseColor());
+
+            }
+
+            // we go to the light(s)
+            for (auto light: areaLights) {
+
+                // light direction
+                Vector3f L = *light->getCentre() - *hitPoint.point;
+                L.normalize();
+
+                // diffuse coefficient
+                float diffuseCoefficient = fmax(0.0f, hitPoint.normal->dot(L));
+
+                sumColor = sumColor + (diffuseCoefficient * light->getDiffuseIntensity() * hitPoint.geo->getDiffuseColor());
+
+            }
+
+            Vector3f hem = randomHem();
+
+            // coords system for intersected point
+            Vector3f p_x = hitPoint.ray->beam->cross(*hitPoint.normal).normalized();
+            Vector3f p_y = p_x.cross(*hitPoint.normal).normalized();
+
+            Vector3f* newDir = new Vector3f(p_x * hem.x() + *hitPoint.normal * hem.z() + p_y * hem.y());
+            newDir->normalize();
+
+            hitPoint.ray = new Ray(hitPoint.point, newDir);
+
+            hitPoint.ray->beam = newDir;
 
         }else{
             return false;
@@ -485,35 +535,6 @@ bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
         return false;
     }
     else{
-
-        // we go to the light(s)
-        for (auto light: pointLights) {
-
-            // light direction
-            Vector3f L = *light->getCentre() - *hitPoint.point;
-            L.normalize();
-
-            // diffuse coefficient
-            float diffuseCoefficient = fmax(0.0f, hitPoint.normal->dot(L));
-
-
-            sumColor = sumColor + (diffuseCoefficient * light->getDiffuseIntensity() * hitPoint.geo->getDiffuseColor());
-
-        }
-
-        // we go to the light(s)
-        for (auto light: areaLights) {
-
-            // light direction
-            Vector3f L = *light->getCentre() - *hitPoint.point;
-            L.normalize();
-
-            // diffuse coefficient
-            float diffuseCoefficient = fmax(0.0f, hitPoint.normal->dot(L));
-
-            sumColor = sumColor + (diffuseCoefficient * light->getDiffuseIntensity() * hitPoint.geo->getDiffuseColor());
-
-        }
 
         // sum up the colors and add the lighting
         *color = sumColor * (1.0f / float(bounces));
@@ -621,6 +642,8 @@ bool RayTracer::render() {
     // ppm parameters
     outputFile << "P3\n" << width << ' ' << height << "\n255\n";
 
+//    vector<float[3]> buffer;
+
     // iterating over all the pixels
     for(int y = 0; y < height ; y++){
 //        cout << y << endl;
@@ -640,12 +663,19 @@ bool RayTracer::render() {
                 // iterating over the samples in the pixel
                 for (int i = 0; i < currentOutput->raysPerPixel[0]; i++) {
                     for (int j = 0; j < currentOutput->raysPerPixel[0]; j++) {
+                        for (int l = 0; l < currentOutput->raysPerPixel[0]; ++l) {
 
-                        // generating a new ray
-                        Ray *ray = new Ray(currentOutput->camera->generateRay(x, y, currentOutput->raysPerPixel[0], i+1, j+1));
-                        if (globalIllumination(ray, color)) {
-                            sumColor = sumColor + *color;
-                            totalSamples++;
+                            srand(time(0));
+                            float randomNumX = float(rand())/RAND_MAX;
+                            srand(randomNumX);
+                            float randomNumY = float(rand())/RAND_MAX;
+
+                            // generating a new ray
+                            Ray *ray = new Ray(currentOutput->camera->generateRay(x, y, currentOutput->raysPerPixel[0], i+1, j+1, randomNumX, randomNumY));
+                            if (globalIllumination(ray, color)) {
+                                sumColor = sumColor + *color;
+                                totalSamples++;
+                            }
                         }
                     }
                 }
