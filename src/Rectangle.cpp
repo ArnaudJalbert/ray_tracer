@@ -62,7 +62,7 @@ std::ostream &operator<<(std::ostream &os, const Rectangle &rectangle) {
 }
 
 // returns the point of intersection
-Vector3f* Rectangle:: findIntersection(struct triangle triangle, Ray *ray){
+Vector3f Rectangle:: findIntersection(struct triangle triangle, Ray *ray){
 
     Vector3f normal = getNormal(triangle.a, triangle.b, triangle.c);
 
@@ -72,30 +72,29 @@ Vector3f* Rectangle:: findIntersection(struct triangle triangle, Ray *ray){
 
     if ( t >= 0){
 
-        Vector3f *p = new Vector3f(getP(t, &ray->beam, &ray->origin));
+        Vector3f p = Vector3f(getP(t, &ray->beam, &ray->origin));
 
-        if(insideTriangle(triangle, p, &normal))
+        if(insideTriangle(triangle, &p, &normal))
             return p;
 
-        delete p;
-        return nullptr;
+        return Vector3f(INFINITY,INFINITY, INFINITY);
     }
 
-    return nullptr;
+    return Vector3f(INFINITY,INFINITY,INFINITY);
 }
 
-Vector3f* Rectangle::intersect(Ray *ray) {
+Vector3f Rectangle::intersect(Ray *ray) {
 
     // check first triangle
-    Vector3f *intersectionPoint = findIntersection(triangle1, ray);
+    Vector3f intersectionPoint = findIntersection(triangle1, ray);
 
     // check second triangle
-    if (intersectionPoint) return intersectionPoint;
+    if (intersectionPoint.x() < INFINITY) return intersectionPoint;
 
     intersectionPoint = findIntersection(triangle2, ray);
 
     // check second triangle
-    if (intersectionPoint) return intersectionPoint;
+    if (intersectionPoint.x() < INFINITY) return intersectionPoint;
 
-    return nullptr;
+    return Vector3f(INFINITY,INFINITY,INFINITY);
 }

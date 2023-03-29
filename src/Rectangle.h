@@ -97,7 +97,6 @@ public:
     static float getT(Vector3f *p0, Vector3f *a, Vector3f *rayBeam, Vector3f *normal){
 
         float t;
-
         Vector3f pointVector = Vector3f(*a - *p0);
 
         float pointDot = pointVector.dot(*normal);
@@ -150,9 +149,9 @@ public:
         return sbc == 1 && sca == 1 && sab == 1;
     }
 
-    static Vector3f* findIntersection(struct triangle triangle, Ray *ray);
+    static Vector3f findIntersection(struct triangle triangle, Ray *ray);
 
-    Vector3f* intersect(Ray* ray) override;
+    Vector3f intersect(Ray* ray) override;
     //------------------
 
 };

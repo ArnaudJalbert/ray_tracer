@@ -17,28 +17,28 @@ class HitPoint {
 public:
 
     Ray* ray;
-    Vector3f* point;
-    Vector3f* normal;
+    Vector3f point;
+    Vector3f normal;
     Geometry* geo;
     bool intersected;
 
     HitPoint(Ray* ray){
         this->ray = ray;
-        point = nullptr;
-        normal = nullptr;
+        point = Vector3f(INFINITY, INFINITY, INFINITY);
+        normal = Vector3f(INFINITY, INFINITY, INFINITY);
         intersected = false;
     }
 
-    void setPoint(Vector3f *point){ this->point = point;};
+    void setPoint(Vector3f point){ this->point = point;};
 
-    void setNormal(Vector3f *normal){ this->normal = normal;};
+    void setNormal(Vector3f normal){ this->normal = normal;};
 
     void setGeo(Geometry* geo) { this->geo = geo;};
 
     void setRay(Ray* ray) { this->ray = ray;};
 
     friend std::ostream &operator<<(std::ostream &os, const HitPoint &point) {
-        os << "ray: " << *point.ray << " point: " << *point.point << " normal: " << *point.normal << " geo: " << *point.geo
+        os << "ray: " << point.ray << " point: " << point.point << " normal: " << point.normal << " geo: " << *point.geo
            << " intersected: " << point.intersected;
         return os;
     }

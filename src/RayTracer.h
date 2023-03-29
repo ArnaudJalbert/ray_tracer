@@ -110,7 +110,7 @@ private:
 
     //-----------------
     // render the scene
-    bool distanceTest(Vector3f* point, HitPoint* closest, Vector3f* origin);
+    bool distanceTest(Vector3f point, HitPoint* closest, Vector3f* origin);
 
     float randomFloat(float base, float offset);
 

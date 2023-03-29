@@ -92,7 +92,7 @@ public:
     // utility functions
     static float vectorDistance( Vector3f *origin, Vector3f *destination );
 
-    virtual Vector3f* intersect(Ray* ray) = 0; // to be overwritten by the inherited geometries
+    virtual Vector3f intersect(Ray* ray) = 0; // to be overwritten by the inherited geometries
     //------------------
 
 };
