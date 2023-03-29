@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "json.hpp"
+#include "simpleppm.h"
 
 // color include
 #include "RGBColor.h"

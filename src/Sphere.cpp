@@ -64,13 +64,13 @@ std::ostream &operator<<(std::ostream &os, const Sphere &sphere) {
 
 Vector3f* Sphere::intersect(Ray *ray) {
 
-    Vector3f *sphereCentre = new Vector3f(*ray->getOrigin() - this->getCentre());
+    Vector3f *sphereCentre = new Vector3f(ray->getOrigin() - this->getCentre());
 
     // a -> v.v t^2
-    float a = ray->getBeam()->dot(*ray->getBeam());
+    float a = ray->getBeam().dot(ray->getBeam());
 
     // b -> p0 - c * t
-    float b = 2.0f * sphereCentre->dot(*ray->getBeam());
+    float b = 2.0f * sphereCentre->dot(ray->getBeam());
 
     // c -> p0-c.p0-c - r^2
     float c = sphereCentre->dot(*sphereCentre) - this->getRadius() * this->getRadius();
@@ -93,21 +93,25 @@ Vector3f* Sphere::intersect(Ray *ray) {
     float t2 = (-b - discriminant) / (2*a);
 
     // point 1
-    Vector3f* point1 = new Vector3f( *ray->getOrigin() + (*ray->getBeam() * t1));
+    Vector3f* point1 = new Vector3f( ray->getOrigin() + (ray->getBeam() * t1));
 
     // point 2
-    Vector3f* point2 = new Vector3f( *ray->getOrigin() + (*ray->getBeam() * t2));
+    Vector3f* point2 = new Vector3f( ray->getOrigin() + (ray->getBeam() * t2));
 
     // distance from the points to the camera
-    float p1Dist = vectorDistance(ray->getOrigin(), point1);
+    float p1Dist = vectorDistance(&ray->origin, point1);
 
-    float p2Dist = vectorDistance(ray->getOrigin(), point2);
+    float p2Dist = vectorDistance(&ray->origin, point2);
+
+    delete sphereCentre;
 
     // we return the closest point
     if(p1Dist <= p2Dist) {
+        delete point2;
         return point1;
     }
 
+    delete point1;
     return point2;
 
 }

@@ -58,8 +58,17 @@ void RGBColor::setB(float b) {
 
 void RGBColor::setRGB(float r, float g, float b) { this->r = r; this->g = g; this->b = b;}
 
-float * RGBColor::getRGBArray() const {
-    static float rgbArray[3];
+double* RGBColor::getRGBArray(){
+
+    if (this->r > 1.0f) this->r = 1.0f;
+    if (this->g > 1.0f) this->g = 1.0f;
+    if (this->b > 1.0f) this->b = 1.0f;
+
+    if (this->r < 0) this->r = 0;
+    if (this->g < 0) this->g = 0;
+    if (this->b < 0) this->b = 0;
+
+    double * rgbArray = new double[3];
     rgbArray[0] = getR();
     rgbArray[1] = getG();
     rgbArray[2] = getB();

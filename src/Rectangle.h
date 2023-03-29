@@ -14,11 +14,6 @@ using std::cout;
 using std::endl;
 using Eigen::Vector3f;
 
-#define DEFAULT_P1 (new Vector3f(-1.0f, 1.0f, 1.0f))
-#define DEFAULT_P2 (new Vector3f(-1.0f, 2.0f, 1.0f))
-#define DEFAULT_P3 (new Vector3f(1.0f, 2.0f, 1.0f))
-#define DEFAULT_P4 (new Vector3f(1.0f, 1.0f, 1.0f))
-
 struct triangle{
     Vector3f *a;
     Vector3f *b;

@@ -8,10 +8,7 @@
 // constructors
 
 Rectangle::Rectangle() {
-    this->setP1(DEFAULT_P1);
-    this->setP2(DEFAULT_P2);
-    this->setP3(DEFAULT_P3);
-    this->setP4(DEFAULT_P4);
+
 }
 
 Rectangle::Rectangle(Vector3f *p1, Vector3f *p2, Vector3f *p3, Vector3f *p4) {
@@ -70,16 +67,17 @@ Vector3f* Rectangle:: findIntersection(struct triangle triangle, Ray *ray){
     Vector3f normal = getNormal(triangle.a, triangle.b, triangle.c);
 
 
-    float t = getT(ray->getOrigin(), triangle.a, ray->getBeam(), &normal);
+    float t = getT(&ray->origin, triangle.a, &ray->beam, &normal);
 
 
     if ( t >= 0){
 
-        Vector3f *p = new Vector3f(getP(t, ray->getBeam(), ray->getOrigin()));
+        Vector3f *p = new Vector3f(getP(t, &ray->beam, &ray->origin));
 
         if(insideTriangle(triangle, p, &normal))
             return p;
 
+        delete p;
         return nullptr;
     }
 

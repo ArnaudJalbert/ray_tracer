@@ -17,6 +17,8 @@ AreaLight::AreaLight(const RGBColor &diffuseIntensity, const RGBColor &specularI
 
     Vector3f* centre = new Vector3f((*p1+*p2+*p3+*p4)/4);
 
+    cout << *centre << endl;
+
     this->setCentre(centre);
 
 }

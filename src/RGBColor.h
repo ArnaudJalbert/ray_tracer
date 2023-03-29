@@ -53,7 +53,7 @@ public:
 
     void setRGB(float r, float g, float b);;
 
-    float * getRGBArray() const;
+    double * getRGBArray();
     //--------------------
 
     //-------

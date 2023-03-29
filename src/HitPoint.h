@@ -22,8 +22,10 @@ public:
     Geometry* geo;
     bool intersected;
 
-    HitPoint(Ray* ray) : ray(ray) {
+    HitPoint(Ray* ray){
+        this->ray = ray;
         point = nullptr;
+        normal = nullptr;
         intersected = false;
     }
 

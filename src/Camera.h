@@ -17,11 +17,6 @@ using Eigen::Vector3f;
 using std::cout;
 using std::endl;
 
-#define DEFAULT_LOOKAT (new Vector3f(0.0f,0.0f,1.0f))
-#define DEFAULT_UP (new Vector3f(0.0f,1.0f,0.0f))
-#define DEFAULT_POSITION (new Vector3f(0.0f, 0.0f, 0.0f))
-#define DEFAULT_FOV (60.0f)
-
 #define PLANE_DISTANCE (1.0f)
 
 class Camera {
