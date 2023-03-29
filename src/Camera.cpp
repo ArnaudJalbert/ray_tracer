@@ -173,10 +173,10 @@ Ray Camera::generateRay(int positionX, int positionY, float grids, int xPlacemen
     float newDelta = this->s/grids;
 
     // width offset
-    Vector3f xOffset = (*this->u * (float(positionX) * this->s + (newDelta * randomNumX) * float(xPlacement)));
+    Vector3f xOffset = (*this->u * (float(positionX) * this->s + newDelta/2 * float(xPlacement)));
 
     // height offset
-    Vector3f yOffset = (*this->v * (float(positionY) * this->s + (newDelta * randomNumY) * float(yPlacement)));
+    Vector3f yOffset = (*this->v * (float(positionY) * this->s + newDelta/2 * float(yPlacement)));
 
     // direction of the ray
     Vector3f *rayDirection = new Vector3f(*this->c + xOffset - yOffset);

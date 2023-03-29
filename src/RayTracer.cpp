@@ -471,7 +471,7 @@ bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
         static std::uniform_real_distribution<> dis(0, 1);// range -1 - 1
 
         // check probability
-//        if (bounces >= 1 && float(dis(e)) > currentOutput->probTerminate) break;
+        if (bounces >= 2 && float(dis(e)) > currentOutput->probTerminate) break;
 
         // intersecting with the geometries
         intersectGeometry(&hitPoint);
@@ -511,18 +511,30 @@ bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
 
             }
 
-            Vector3f hem = randomHem();
+//            Vector3f hem = randomHem();
+//
+//            // coords system for intersected point
+//            Vector3f p_x = hitPoint.ray->beam->cross(*hitPoint.normal).normalized();
+//            Vector3f p_y = p_x.cross(*hitPoint.normal).normalized();
+//
+//            Vector3f* newDir = new Vector3f(p_x * hem.x() + *hitPoint.normal * hem.z() + p_y * hem.y());
+//            newDir->normalize();
+//
+//            hitPoint.ray = new Ray(hitPoint.point, newDir);
+//
+//            hitPoint.ray->beam = newDir;
+            // computing the next ray
 
-            // coords system for intersected point
-            Vector3f p_x = hitPoint.ray->beam->cross(*hitPoint.normal).normalized();
-            Vector3f p_y = p_x.cross(*hitPoint.normal).normalized();
+            float attenuation = hitPoint.ray->beam->dot(*hitPoint.normal);
+            attenuation = fmax(attenuation, -attenuation);
+            sumColor = sumColor * attenuation;
+            Vector3f unitPoint = randomUnitPoint(&hitPoint);
 
-            Vector3f* newDir = new Vector3f(p_x * hem.x() + *hitPoint.normal * hem.z() + p_y * hem.y());
-            newDir->normalize();
+            Vector3f direction = *hitPoint.point + unitPoint;
 
-            hitPoint.ray = new Ray(hitPoint.point, newDir);
+            hitPoint.ray =  new Ray(hitPoint.point, &direction);
 
-            hitPoint.ray->beam = newDir;
+            hitPoint.intersected = false;
 
         }else{
             return false;
@@ -646,7 +658,7 @@ bool RayTracer::render() {
 
     // iterating over all the pixels
     for(int y = 0; y < height ; y++){
-//        cout << y << endl;
+        cout << y << endl;
         for(int x = 0; x < width; x++){
 
             // default color
@@ -720,7 +732,6 @@ bool RayTracer::render() {
                         localIllumination(hitPoint, color);
 
                     }
-
 
                     delete ray;
 
