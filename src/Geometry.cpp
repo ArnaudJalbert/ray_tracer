@@ -142,15 +142,15 @@ std::ostream &operator<<(std::ostream &os, const Geometry &geometry) {
 //------------------
 // utility functions
 
-float Geometry::vectorDistance( Vector3f *origin, Vector3f *destination){
+float Geometry::vectorDistance( Vector3f origin, Vector3f destination){
 
-    float x = destination->x() - origin->x();
+    float x = destination.x() - origin.x();
     x = x * x;
 
-    float y = destination->y() - origin->y();
+    float y = destination.y() - origin.y();
     y = y * y;
 
-    float z = destination->z() - origin->z();
+    float z = destination.z() - origin.z();
     z = z * z;
 
     float xyz = x + y + z;

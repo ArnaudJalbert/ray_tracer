@@ -6,6 +6,10 @@
 #define RAYTRACER_AREALIGHT_H
 
 #include "Light.h"
+#include "PointLight.h"
+#include <vector>
+
+using std::vector;
 
 class AreaLight: public Light{
 
@@ -37,6 +41,7 @@ public:
 
     void setP4(Vector3f *p4){ this->p4 = p4;};
 
+    vector<PointLight> getPointLights();
 };
 
 

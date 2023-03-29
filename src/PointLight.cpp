@@ -4,5 +4,10 @@
 
 #include "PointLight.h"
 
-PointLight::PointLight(const RGBColor &diffuseIntensity, const RGBColor &specularIntensity, Vector3f *centre) : Light(
+PointLight::PointLight(const RGBColor &diffuseIntensity, const RGBColor &specularIntensity, Vector3f centre) : Light(
         diffuseIntensity, specularIntensity, centre) {}
+
+std::ostream &operator<<(std::ostream &os, const PointLight &light) {
+    os << static_cast<const Light &>(light) << " centre: " << light.centre;
+    return os;
+}

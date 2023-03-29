@@ -5,19 +5,20 @@
 #ifndef RAYTRACER_POINTLIGHT_H
 #define RAYTRACER_POINTLIGHT_H
 
+#include <ostream>
 #include "Light.h"
 
 class PointLight: public Light {
 
 private:
-    Vector3f *centre;
+    Vector3f centre;
 
 public:
 
-    PointLight(const RGBColor &diffuseIntensity, const RGBColor &specularIntensity, Vector3f *centre);
+    PointLight(const RGBColor &diffuseIntensity, const RGBColor &specularIntensity, Vector3f centre);
 
 
-
+    friend std::ostream &operator<<(std::ostream &os, const PointLight &light);
 };
 
 

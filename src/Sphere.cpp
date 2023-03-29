@@ -99,9 +99,9 @@ Vector3f Sphere::intersect(Ray *ray) {
     Vector3f point2 =  Vector3f( ray->getOrigin() + (ray->getBeam() * t2));
 
     // distance from the points to the camera
-    float p1Dist = vectorDistance(&ray->origin, &point1);
+    float p1Dist = vectorDistance(ray->origin, point1);
 
-    float p2Dist = vectorDistance(&ray->origin, &point2);
+    float p2Dist = vectorDistance(ray->origin, point2);
 
     // we return the closest point
     if(p1Dist <= p2Dist) {
