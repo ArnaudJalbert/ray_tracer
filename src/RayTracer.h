@@ -120,7 +120,7 @@ private:
 
     bool globalIllumination(Ray* ray, RGBColor* color);
 
-    bool inShadow(Vector3f point, Vector3f lightPosition);
+    bool inShadow(Vector3f point, Vector3f lightPosition, Vector3f normal);
 
     HitPoint* intersectSpheres(HitPoint* closest);
 
@@ -140,8 +140,6 @@ public:
     // method called in main
     // it's the only method called in main so everything should start from here
     int run();
-
-
 
 };
 

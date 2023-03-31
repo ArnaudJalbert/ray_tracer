@@ -337,6 +337,7 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
     RGBColor specular = RGBColor(0,0,0);
 
     bool shadow = false;
+    bool skipShadow = false;
 
     float shadowAttenutation = 1.0f;
 
@@ -369,9 +370,9 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
         specular = specular + (specularCoefficient * light->getSpecularIntensity() * geo->getSpecularColor());
 
         // check if it's in shadow
-        if (inShadow(hitPoint->point, light->getCentre())) {
+        if (!skipShadow && inShadow(hitPoint->point, light->getCentre(), hitPoint->normal)) {
             shadow = true;
-            shadowAttenutation -= 0.5;
+            shadowAttenutation -= 0.2;
         }
 
 
@@ -384,12 +385,23 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
 
         vector<PointLight> separateLights = light->getPointLights();
 
-        int size = separateLights.size();
+        float size = float(separateLights.size());
 
-        for (auto separateLight : separateLights) {
+        for (int i = 0; i < size; i++) {
+
+            float areaShadowAttenuation = 1.0f;
+            bool areaShadow = false;
+
+            if (!skipShadow && inShadow(hitPoint->point, separateLights[i].getCentre(), hitPoint->normal)) {
+                areaShadowAttenuation = 0.2f;
+                areaShadow = true;
+            }else{
+                areaShadow = false;
+                shadowAttenutation = 0.5;
+            }
 
             // light direction
-            Vector3f L = separateLight.getCentre() - hitPoint->point;
+            Vector3f L = separateLights[i].getCentre() - hitPoint->point;
             L.normalize();
 
             // reflected ray
@@ -397,31 +409,25 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
             R.normalize();
 
             // vector to viewer
-            Vector3f V = - Vector3f(-ray->getBeam().x(), ray->getBeam().y(), ray->getBeam().z());
+            Vector3f V = Vector3f(-ray->getBeam().x(), ray->getBeam().y(), ray->getBeam().z());
             V.normalize();
 
             Vector3f H = (V + L);
 
             float diffuseCoefficient = fmax(0.0f, N.dot(L));
 
-            diffuseSum = diffuseSum + (diffuseCoefficient * separateLight.getDiffuseIntensity() * geo->getDiffuseColor());
+            diffuseSum = diffuseSum + (((diffuseCoefficient * separateLights[i].getDiffuseIntensity() * geo->getDiffuseColor())) * areaShadowAttenuation);
 
             float specularCoefficient = fmax(N.dot(H), 0.0f);
 
             specularCoefficient = pow(specularCoefficient, geo->getPhongCoefficient());
 
-            specularSum = specularSum + (specularCoefficient * separateLight.getSpecularIntensity() * geo->getSpecularColor());
+            specularSum = specularSum + ((specularCoefficient * separateLights[i].getSpecularIntensity() * geo->getSpecularColor()));
 
-            if (inShadow(hitPoint->point, separateLight.getCentre())) {
-                shadow = true;
-            }
         }
 
-        diffuseSum = diffuseSum * (1/size);
-        specularSum = specularSum * (1/size);
-
-        diffuse = diffuse + diffuseSum;
-        specular = specular + specularSum;
+        diffuse = (diffuseSum*(1.0f/size)) + diffuse;
+        specular = (specularSum*(1.0f/size)) + specular;
 
     }
 
@@ -430,9 +436,9 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
     RGBColor ambient = geo->getAmbientReflection() * geo->getAmbientColor();
 
     if (shadow)
-        *color = ambient + diffuse * shadowAttenutation;
+        *color = (ambient + diffuse * specular) * shadowAttenutation;
     else
-        *color = ambient+diffuse+specular;
+        *color = ambient + diffuse + specular;
 
 }
 
@@ -566,7 +572,7 @@ bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
         // we go to the light(s)
         for (auto light: pointLights) {
             float shadow = 1.0f;
-            if (inShadow(firstPoint, light->getCentre()))
+            if (inShadow(hitPoint.point, light->getCentre(), hitPoint.normal))
                 shadow = 0.5f;
 
             // light direction
@@ -591,7 +597,7 @@ bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
             Vector3f L = light->getCentre() - hitPoint.point;
             L.normalize();
 
-            if (inShadow(firstPoint, light->getCentre()))
+            if (inShadow(hitPoint.point, light->getCentre(), hitPoint.normal))
                 shadow = 0.5f;
 
             // diffuse coefficient
@@ -613,15 +619,18 @@ bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
 
 }
 
-bool RayTracer::inShadow(Vector3f point, Vector3f lightPosition){
+bool RayTracer::inShadow(Vector3f point, Vector3f lightPosition, Vector3f normal){
 
-    Ray shadowRay = Ray(lightPosition, point);
+
+    Vector3f origin = point + normal * 0.001 ;
+
+    Ray shadowRay = Ray(origin, lightPosition);
 
     HitPoint shadowIntersection = HitPoint(&shadowRay);
 
     intersectGeometry(&shadowIntersection);
 
-    if ( shadowIntersection.intersected && Geometry::vectorDistance(point, lightPosition)-0.01 <= Geometry::vectorDistance(shadowIntersection.point, lightPosition)) {
+    if ( shadowIntersection.intersected && Geometry::vectorDistance(lightPosition, origin) < Geometry::vectorDistance(lightPosition, shadowIntersection.point)) {
         return false;
     }
 

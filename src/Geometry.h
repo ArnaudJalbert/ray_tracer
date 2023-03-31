@@ -32,7 +32,8 @@ public:
     RGBColor ambientColor; // [3 float] that represents a rgb color → ambient color
     RGBColor diffuseColor; // [3 float] that represents a rgb color → diffuse color
     RGBColor specularColor; // [3 float] that represents a rgb color → specular color
-    
+
+    string type;
     //-------------
     // constructors
     Geometry();

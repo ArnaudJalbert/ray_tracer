@@ -42,6 +42,8 @@ Rectangle::Rectangle(float ambientReflection,
                     this->setP3(p3);
                     this->setP4(p4);
 
+                    this->type = "rectangle";
+
                     triangle1.a = p1;
                     triangle1.b = p2;
                     triangle1.c = p3;
