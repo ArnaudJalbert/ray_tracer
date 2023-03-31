@@ -120,7 +120,7 @@ private:
 
     bool globalIllumination(Ray* ray, RGBColor* color);
 
-    bool inShadow(Vector3f point, Vector3f lightPosition);
+    bool inShadow(Vector3f point, Vector3f lightPosition, Vector3f normal);
 
     HitPoint* intersectSpheres(HitPoint* closest);
 
@@ -142,7 +142,7 @@ public:
     int run();
 
 
-
+    bool inShadowRectangle(Vector3f point, Vector3f lightPosition, Vector3f normal);
 };
 
 
