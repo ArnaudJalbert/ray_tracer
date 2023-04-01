@@ -22,6 +22,8 @@ private:
 
 public:
 
+    int n;
+
     AreaLight(const RGBColor &diffuseIntensity, const RGBColor &specularIntensity, Vector3f *p1, Vector3f *p2,
               Vector3f *p3, Vector3f *p4);
 

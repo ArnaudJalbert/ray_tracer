@@ -143,6 +143,8 @@ public:
 
 
     bool inShadowRectangle(Vector3f point, Vector3f lightPosition, Vector3f normal);
+
+    bool inShadowALRect(Vector3f point, Vector3f lightPosition, Vector3f normal);
 };
 
 

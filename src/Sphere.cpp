@@ -39,6 +39,7 @@ Sphere::Sphere(float ambientReflection,
 
     this->setRadius(radius);
     this->setCentre(centre);
+    this->type = "sphere";
 
 }
 //-------------

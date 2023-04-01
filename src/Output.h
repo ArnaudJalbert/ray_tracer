@@ -35,6 +35,8 @@ public:
 
     float n;
 
+    RGBColor ai;
+
     RGBColor bgColor;
 
 };

@@ -55,9 +55,9 @@ vector <PointLight> AreaLight::getPointLights() {
     float yStep = *yMax - *zMin;
     float zStep = *zMax - *zMin;
 
-    for (int j = 0; j < 5; ++j) {
-        for (int l = 0; l < 5; ++l) {
-            for (int k = 0; k < 5; ++k) {
+    for (int j = 0; j < n; ++j) {
+        for (int l = 0; l < n; ++l) {
+            for (int k = 0; k < n; ++k) {
                 float x_center = *xMin + (j + 0.5f) * xStep;
                 float y_center = *yMin + (l + 0.5f) * yStep;
                 float z_center = *zMin + (k + 0.5f) * zStep;

@@ -186,9 +186,13 @@ void RayTracer::createLightObjects() {
                                         light["p4"][1],
                                         light["p4"][2]);
 
+
             // creating the object
-            // TODO put the right instantiation here when light is implemented
             AreaLight* areaLight = new AreaLight(diffuseIntensity, specularIntensity, p1, p2, p3, p4);
+
+            try{
+                areaLight->n = light["n"];
+            }catch(...){areaLight->n = 8;}
 
             // adding the object to the list
             this->areaLights.push_back(areaLight);
@@ -240,26 +244,46 @@ void RayTracer::createOutputParameters() {
         // optional parameters
         try {
             newOutput->globalIllum = output["globalillum"];
-        } catch(...) { cout << "No global illumination" << endl;}
+        } catch(...) { newOutput->globalIllum = false;}
 
         try {
             newOutput->maxBounces = output["maxbounces"];
-        } catch(...) { cout << "No max bounces" << endl;}
+        } catch(...) { newOutput->maxBounces = 3;}
 
         try {
             newOutput->probTerminate = output["probterminate"];
-        } catch(...) { cout << "No probterminate" << endl;}
+        } catch(...) { newOutput->probTerminate = 0.33;}
 
         try {
             newOutput->raysPerPixel[0] = output["raysperpixel"][0];
-            newOutput->raysPerPixel[1] = output["raysperpixel"][1];
-            newOutput->raysPerPixel[1] = output["raysperpixel"][2];
-        } catch(...) { cout << "No raysperpixel" << endl;}
+            newOutput->raysPerPixel[1] = output["raysperpixel"][0];
+            newOutput->raysPerPixel[2] = output["raysperpixel"][0];
+        } catch(...) {
+            newOutput->raysPerPixel[0] = 10;
+            newOutput->raysPerPixel[1] = 10;
+            newOutput->raysPerPixel[2] = 1;}
+
+        try {
+            newOutput->raysPerPixel[2] = output["raysperpixel"][1];
+        } catch(...) {newOutput->raysPerPixel[2] = 1;}
+
+        try {
+            float temp = newOutput->raysPerPixel[2];
+            newOutput->raysPerPixel[2] = output["raysperpixel"][2];
+            newOutput->raysPerPixel[1] = temp;
+        } catch(...) {}
 
         try {
            newOutput->anitAliasing = output["antialiasing"];
-        } catch(...) { cout << "No antialiasing" << endl;}
+        } catch(...) { newOutput->anitAliasing = false;}
 
+        try{
+            newOutput->ai = RGBColor(output["ai"][0],output["ai"][1],output["ai"][2]);
+        } catch (...){newOutput->ai = RGBColor(1,1,1);}
+
+        try{
+            newOutput->n = output["n"];
+        } catch (...){newOutput->n = 10;}
 
         // camera parameters
         Vector3f *lookat = new Vector3f(output["lookat"][0],
@@ -378,7 +402,7 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
     }
 
 
-// area lights
+    // area lights
     for(auto light: areaLights){
         RGBColor diffuseSum = RGBColor(0,0,0);
         RGBColor specularSum = RGBColor(0,0,0);
@@ -390,12 +414,11 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
         for (int i = 0; i < size; i++) {
 
             float areaShadowAttenuation = 1.0f;
-            bool areaShadow = false;
 
             if ( inShadowRectangle(hitPoint->point, separateLights[i].getCentre(), hitPoint->normal)) {
-                areaShadowAttenuation = 0.2f;
+                areaShadowAttenuation = 0.1f;
             }else{
-                shadowAttenutation = 1.0f;
+                areaShadowAttenuation = 1.0f;
             }
 
             // light direction
@@ -407,7 +430,7 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
             R.normalize();
 
             // vector to viewer
-            Vector3f V = Vector3f(-ray->getBeam().x(), ray->getBeam().y(), ray->getBeam().z());
+            Vector3f V = - Vector3f(hitPoint->ray->beam.x(), hitPoint->ray->beam.y(), hitPoint->ray->beam.z());
             V.normalize();
 
             Vector3f H = (V + L);
@@ -432,10 +455,11 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
 
 
     // ambient lighting
-    RGBColor ambient = geo->getAmbientReflection() * geo->getAmbientColor();
+    RGBColor ambient = geo->getAmbientReflection() * geo->getAmbientColor() * currentOutput->ai;
 
-    if (shadow)
+    if (shadow) {
         *color = ambient + diffuse * shadowAttenutation;
+    }
     else
         *color = ambient + diffuse + specular;
 
@@ -619,6 +643,23 @@ bool RayTracer::inShadow(Vector3f point, Vector3f lightPosition, Vector3f normal
     return shadowIntersection.intersected;
 }
 
+bool RayTracer::inShadowALRect(Vector3f point, Vector3f lightPosition, Vector3f normal){
+
+    Vector3f origin = point + normal * 0.01;
+
+    Ray shadowRay = Ray(origin, lightPosition);
+
+    HitPoint shadowIntersection = HitPoint(&shadowRay);
+
+    intersectGeometry(&shadowIntersection);
+
+    if ( shadowIntersection.intersected && Geometry::vectorDistance(point, lightPosition) <= Geometry::vectorDistance(point, shadowIntersection.point)) {
+        return false;
+    }
+
+    return shadowIntersection.intersected;
+}
+
 bool RayTracer::inShadowRectangle(Vector3f point, Vector3f lightPosition, Vector3f normal){
 
     Vector3f origin = point + normal * 0.1;
@@ -735,8 +776,8 @@ bool RayTracer::render() {
 
                 // iterating over the samples in the pixel
                 for (int i = 0; i < currentOutput->raysPerPixel[0]; i++) {
-                    for (int j = 0; j < currentOutput->raysPerPixel[0]; j++) {
-                        for (int l = 0; l < currentOutput->raysPerPixel[0]; ++l) {
+                    for (int j = 0; j < currentOutput->raysPerPixel[1]; j++) {
+                        for (int l = 0; l < currentOutput->raysPerPixel[2]; ++l) {
 
                             srand(time(0));
                             float randomNumX = float(rand())/RAND_MAX;
@@ -758,10 +799,10 @@ bool RayTracer::render() {
 
                 if (currentOutput->anitAliasing){
                     // iterating over the samples in the pixel
-                    for (int i = 0; i < currentOutput->raysPerPixel[0]; i++) {
-                        for (int j = 0; j < currentOutput->raysPerPixel[0]; j++) {
+                    for (int i = 0; i < currentOutput->n; i++) {
+                        for (int j = 0; j < currentOutput->n; j++) {
 
-                            for (int l = 0; l <currentOutput->raysPerPixel[0]; ++l) {
+                            for (int l = 0; l <currentOutput->n; ++l) {
 
                                 srand(time(0));
                                 float randomNumX = float(rand())/RAND_MAX;
@@ -769,7 +810,7 @@ bool RayTracer::render() {
                                 float randomNumY = float(rand())/RAND_MAX;
 
                                 // generating a new ray
-                                Ray ray = currentOutput->camera->generateRay(x, y, currentOutput->raysPerPixel[0], i+1, j+1, randomNumX, randomNumY);
+                                Ray ray = currentOutput->camera->generateRay(x, y, currentOutput->n, i+1, j+1, randomNumX, randomNumY);
 
                                 // this is the closest point to the camera for all intersection
                                 HitPoint hitPoint = HitPoint(&ray);

@@ -46,6 +46,8 @@ Rectangle::Rectangle(float ambientReflection,
                     normalB = p2;
                     normalC = p3;
 
+                    this->type = "sphere";
+
                     triangle1.a = p1;
                     triangle1.b = p2;
                     triangle1.c = p3;
