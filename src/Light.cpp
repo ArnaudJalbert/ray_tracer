@@ -30,6 +30,6 @@ std::ostream &operator<<(std::ostream &os, const Light &light) {
 }
 
 Light::Light(const RGBColor &diffuseIntensity, const RGBColor &specularIntensity, Vector3f centre) : diffuseIntensity(
-        diffuseIntensity), specularIntensity(specularIntensity), centre(centre) {}
+        diffuseIntensity), specularIntensity(specularIntensity) {}
 //----------------------
 

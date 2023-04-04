@@ -27,6 +27,17 @@ float RGBColor::getR() const {
     return r;
 }
 
+float RGBColor::getFinalR(){
+
+    float finalR;
+
+    if (this->r > 1.0f) finalR = 1.0f;
+    else if (this->r < 0.0f) finalR = 0.0f;
+    else finalR = r;
+
+    return finalR;
+}
+
 void RGBColor::setR(float r) {
     if (rgbRange(r)) {
         RGBColor::r = r;
@@ -36,6 +47,17 @@ void RGBColor::setR(float r) {
 
 float RGBColor::getG() const {
     return g;
+}
+
+float RGBColor::getFinalG(){
+
+    float finalG;
+
+    if (this->g > 1.0f) finalG = 1.0f;
+    else if (this->g < 0.0f) finalG = 0.0f;
+    else finalG = g;
+
+    return finalG;
 }
 
 void RGBColor::setG(float g) {
@@ -49,6 +71,17 @@ float RGBColor::getB() const {
     return this->b;
 }
 
+float RGBColor::getFinalB(){
+
+    float finalB;
+
+    if (this->b > 1.0f) finalB = 1.0f;
+    else if (this->b < 0.0f) finalB = 0.0f;
+    else finalB = b;
+
+    return finalB;
+}
+
 void RGBColor::setB(float b) {
     if (rgbRange(b)) {
         RGBColor::b = b;
@@ -58,22 +91,6 @@ void RGBColor::setB(float b) {
 
 void RGBColor::setRGB(float r, float g, float b) { this->r = r; this->g = g; this->b = b;}
 
-double* RGBColor::getRGBArray(){
-
-    if (this->r > 1.0f) this->r = 1.0f;
-    if (this->g > 1.0f) this->g = 1.0f;
-    if (this->b > 1.0f) this->b = 1.0f;
-
-    if (this->r < 0) this->r = 0;
-    if (this->g < 0) this->g = 0;
-    if (this->b < 0) this->b = 0;
-
-    double * rgbArray = new double[3];
-    rgbArray[0] = getR();
-    rgbArray[1] = getG();
-    rgbArray[2] = getB();
-    return rgbArray;
-}
 //--------------------
 
 //-------

@@ -3,3 +3,7 @@
 //
 
 #include "Output.h"
+
+Output::~Output() {
+    delete camera;
+}

@@ -3,6 +3,7 @@
 //
 
 #include "AreaLight.h"
+#include <random>
 
 AreaLight::AreaLight(const RGBColor &diffuseIntensity, const RGBColor &specularIntensity, Vector3f *p1, Vector3f *p2,
                      Vector3f *p3, Vector3f *p4){
@@ -17,7 +18,7 @@ AreaLight::AreaLight(const RGBColor &diffuseIntensity, const RGBColor &specularI
 
     Vector3f centre = Vector3f((*p1+*p2+*p3+*p4)/4);
 
-    this->setCentre(centre);
+    this->areaCentre = centre;
 
 }
 
@@ -25,38 +26,59 @@ vector <PointLight> AreaLight::getPointLights() {
 
     vector<PointLight> pointLights;
 
-    // Find the midpoint of the line connecting p1 and p2
-    Vector3f midPoint12 = Vector3f();
-    midPoint12.x() = (this->p1->x() + this->p2->x()) / 2;
-    midPoint12.y() = (this->p1->y() + this->p2->y()) / 2;
-    midPoint12.z() = (this->p1->z() + this->p2->z()) / 2;
-    PointLight light12 = PointLight(this->getDiffuseIntensity(), this->getSpecularIntensity(), midPoint12);
-    pointLights.push_back(light12);
+    vector<float> xList;
+    xList.push_back(p1->x());
+    xList.push_back(p2->x());
+    xList.push_back(p3->x());
+    xList.push_back(p4->x());
 
-    // Find the midpoint of the line connecting p2 and p3
-    Vector3f midPoint13 = Vector3f();
-    midPoint13.x() = (this->p1->x() + this->p3->x()) / 2;
-    midPoint13.y() = (this->p1->y() + this->p3->y()) / 2;
-    midPoint13.z() = (this->p1->z() + this->p3->z()) / 2;
-    PointLight light13 = PointLight(this->getDiffuseIntensity(), this->getSpecularIntensity(), midPoint13);
-    pointLights.push_back(light13);
+    vector<float> yList;
+    yList.push_back(p1->y());
+    yList.push_back(p2->y());
+    yList.push_back(p3->y());
+    yList.push_back(p4->y());
 
-    // Find the midpoint of the line connecting p3 and p4
-    Vector3f midPoint14 = Vector3f();
-    midPoint14.x() = (this->p1->x() + this->p4->x()) / 2;
-    midPoint14.y() = (this->p1->y() + this->p4->y()) / 2;
-    midPoint14.z() = (this->p1->z() + this->p4->z()) / 2;
-    PointLight light14 = PointLight(this->getDiffuseIntensity(), this->getSpecularIntensity(), midPoint14);
-    pointLights.push_back(light14);
+    vector<float> zList;
+    zList.push_back(p1->z());
+    zList.push_back(p2->z());
+    zList.push_back(p3->z());
+    zList.push_back(p4->z());
 
-    // Find the midpoint of the line connecting p4 and p1
-    Vector3f midPoint41 = Vector3f();
-    midPoint41.x() = (this->p4->x() + this->p1->x()) / 2;
-    midPoint41.y() = (this->p4->y() + this->p1->y()) / 2;
-    midPoint41.z() = (this->p4->z() + this->p1->z()) / 2;
-    PointLight light41 = PointLight(this->getDiffuseIntensity(), this->getSpecularIntensity(), midPoint41);
-    pointLights.push_back(light41);
+    auto xMin = std::min_element(xList.begin(), xList.end());
+    auto yMin = std::min_element(yList.begin(), yList.end());
+    auto zMin = std::min_element(zList.begin(), zList.end());
+
+    auto xMax = std::max_element(xList.begin(), xList.end());
+    auto yMax = std::max_element(yList.begin(), yList.end());
+    auto zMax = std::min_element(zList.begin(), zList.end());
+
+    float xStep = *xMax - *xMin;
+    float yStep = *yMax - *yMin;
+    float zStep = *zMax - *zMin;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(0, 1);
+
+    for (int j = 0; j < n; ++j) {
+        for (int l = 0; l < n; ++l) {
+            for (int k = 0; k < n; ++k) {
+                float x_center = *xMin + dis(gen) * xStep;
+                float y_center = *yMin + dis(gen) * yStep;
+                float z_center = *zMin + dis(gen) * zStep;
+                PointLight light = PointLight(this->getDiffuseIntensity(), this->getSpecularIntensity(), Vector3f(x_center, y_center, z_center));
+//                cout << light << endl;
+                pointLights.push_back(light);
+            }
+        }
+    }
 
     return pointLights;
 }
 
+AreaLight::~AreaLight() {
+    delete p1;
+    delete p2;
+    delete p3;
+    delete p4;
+}

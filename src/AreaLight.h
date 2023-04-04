@@ -13,17 +13,23 @@ using std::vector;
 
 class AreaLight: public Light{
 
-private:
+public:
 
     Vector3f* p1;
     Vector3f* p2;
     Vector3f* p3;
     Vector3f* p4;
 
-public:
+    Vector3f areaCentre;
+
+    int n;
+
+    vector<PointLight> getPointLights();
 
     AreaLight(const RGBColor &diffuseIntensity, const RGBColor &specularIntensity, Vector3f *p1, Vector3f *p2,
               Vector3f *p3, Vector3f *p4);
+
+    virtual ~AreaLight();
 
     Vector3f *getP1() const{return this->p1;};
 
@@ -41,7 +47,7 @@ public:
 
     void setP4(Vector3f *p4){ this->p4 = p4;};
 
-    vector<PointLight> getPointLights();
+
 };
 
 
