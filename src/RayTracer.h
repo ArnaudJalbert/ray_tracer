@@ -13,8 +13,8 @@
 #include <Eigen/Dense>
 #include <vector>
 
-#include "json.hpp"
-#include "simpleppm.h"
+#include "../external/json.hpp"
+#include "../external/simpleppm.h"
 
 // color include
 #include "RGBColor.h"
@@ -139,10 +139,10 @@ public:
 
     // method called in main
     // it's the only method called in main so everything should start from here
-    int run();
+    void run();
 
 
-    bool inShadowRectangle(Vector3f point, Vector3f lightPosition, Vector3f normal);
+    bool inShadowGlobal(Vector3f point, Vector3f lightPosition, Vector3f normal);
 
     bool inShadowALRect(Vector3f point, Vector3f lightPosition, Vector3f normal);
 

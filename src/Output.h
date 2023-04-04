@@ -11,6 +11,9 @@
 class Output {
 
 public:
+
+    virtual ~Output();
+
     // camera of the scene
     Camera* camera;
 

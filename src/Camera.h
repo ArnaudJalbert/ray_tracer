@@ -21,7 +21,7 @@ using std::endl;
 
 class Camera {
 
-private:
+public:
 
     Vector3f *lookat; // lookat vector of the camera
     Vector3f *up; // up vector of the camera
@@ -45,12 +45,12 @@ private:
     float alpha; // height of half the projection plane
     float s; // size of a pixel
 
-public:
-
     Camera();
 
     Camera(Vector3f *lookat, Vector3f *up, Vector3f *position,
            float fov, int width, int height);
+
+    virtual ~Camera();
 
     //-------------------
     // getters and setters

@@ -75,3 +75,10 @@ vector <PointLight> AreaLight::getPointLights() {
 
     return pointLights;
 }
+
+AreaLight::~AreaLight() {
+    delete p1;
+    delete p2;
+    delete p3;
+    delete p4;
+}

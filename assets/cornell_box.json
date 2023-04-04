@@ -330,7 +330,7 @@
         },
         {
             "type":"point",
-            "centre":[278, 273, 800],
+            "centre":[278, 540, -280],
             "id":[1, 1, 1],
             "is":[1, 1, 1],
             "use": false
@@ -348,8 +348,8 @@
 
         "globalillum": true,
         "raysperpixel": [10,10],
-        "maxbounces": 3,
-        "probterminate": 0.333
+        "maxbounces": 2,
+        "probterminate": 0.5
     }
     ]
 }

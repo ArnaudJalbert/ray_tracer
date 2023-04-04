@@ -98,7 +98,6 @@
             "pc":0
 
         }
-    
     ],
     "light":[
         {
@@ -108,7 +107,9 @@
             "is":[1, 1, 1]
         }
     ],
-    "output":[{
+    "output":[
+
+        {
         "filename":"cornell_box_empty_pl.ppm",
         "size":[500,500],
         "lookat":[0,0,-1],
@@ -122,6 +123,21 @@
         "raysperpixel": [10, 10],
         "maxbounces": 3,
         "probterminate": 0.3333
-    }
+    },
+    {
+            "filename":"cornell_box_empty_pl_2.ppm",
+            "size":[1000,1000],
+            "lookat":[0,0,-1],
+            "up":[0,1,0],
+            "fov":50,
+            "centre":[278, 273, 800],
+            "ai":[1,1,1],
+            "bkc":[0.5,0.5,0.5],
+
+            "globalillum": false,
+            "raysperpixel": [10, 10],
+            "maxbounces": 3,
+            "probterminate": 0.3333
+        }
     ]
 }

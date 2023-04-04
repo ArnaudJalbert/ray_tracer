@@ -204,4 +204,15 @@ void Camera::cameraGeometryInfo() {
     cout << "c:" << endl << *this->c << endl;
 
 }
+
+Camera::~Camera() {
+    delete lookat;
+    delete up;
+    delete position;
+    delete a;
+    delete b;
+    delete c;
+    delete u;
+    delete v;
+}
 //------------------

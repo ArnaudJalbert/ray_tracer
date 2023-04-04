@@ -34,7 +34,6 @@ public:
     /**
      * Noting to delete for now
      */
-    virtual ~RGBColor() = default;
     //----------
 
     //--------------------
@@ -53,7 +52,6 @@ public:
 
     void setRGB(float r, float g, float b);;
 
-    double * getRGBArray();
     //--------------------
 
     //-------
@@ -84,6 +82,13 @@ public:
     // utility functions
     void writeColor(std::ostream &out);
     //------------------
+    float getFinalR() const;
+
+    float getFinalR();
+
+    float getFinalG();
+
+    float getFinalB();
 };
 
 

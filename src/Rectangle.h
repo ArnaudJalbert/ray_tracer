@@ -51,6 +51,8 @@ public:
               const RGBColor &ambientColor, const RGBColor &diffuseColor, const RGBColor &specularColor,
               Vector3f *p1, Vector3f *p2, Vector3f *p3, Vector3f *p4);
 
+    virtual ~Rectangle();
+
     //-------------
 
     //--------------------

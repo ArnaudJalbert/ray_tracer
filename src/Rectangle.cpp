@@ -103,3 +103,11 @@ Vector3f Rectangle::intersect(Ray *ray) {
 
     return Vector3f(INFINITY,INFINITY,INFINITY);
 }
+
+Rectangle::~Rectangle() {
+    delete p1;
+    delete p2;
+    delete p3;
+    delete p4;
+
+}

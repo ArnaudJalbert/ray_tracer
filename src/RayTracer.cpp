@@ -3,7 +3,6 @@
 //
 
 #include "RayTracer.h"
-#include <stdlib.h>
 
 RayTracer::RayTracer(nlohmann::json j) {
 
@@ -13,7 +12,7 @@ RayTracer::RayTracer(nlohmann::json j) {
 
 }
 
-int RayTracer::run() {
+void RayTracer::run() {
 
     for(auto output: outputs){
         currentOutput = output;
@@ -22,7 +21,26 @@ int RayTracer::run() {
         this->render();
     }
 
-    return 1;
+    for(auto rectangle: rectangles){
+        delete rectangle;
+    }
+
+    for(auto areaLight: areaLights){
+        delete areaLight;
+    }
+
+    for (auto output: outputs){
+        delete output;
+    }
+
+    for(auto pointLight: pointLights){
+        delete pointLight;
+    }
+
+    for(auto sphere: spheres){
+        delete sphere;
+    }
+
 }
 
 //------------
@@ -334,17 +352,6 @@ bool RayTracer::distanceTest(Vector3f point, HitPoint* closest, Vector3f* origin
     return false;
 }
 
-float RayTracer::randomFloat(float base, float offset){
-
-    std::default_random_engine e;
-    std::uniform_real_distribution<> dis(-1,1); // range -1 - 1
-
-    float num = base * float(dis(e)) + offset;
-
-
-    return num;
-}
-
 void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
 
     // geometry properties
@@ -383,7 +390,7 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
         intersectGeometry(&shadowHit);
 
         if (shadowHit.intersected && shadowHit.geo != geo){
-            if (Geometry::vectorDistance(hitPoint->point, shadowHit.point) < Geometry::vectorDistance(hitPoint->point, light->centre)) {
+            if ((shadowHit.point - hitPoint->point).norm()+0.100 < (light->centre - hitPoint->point).norm()) {
                 shadowAttenuation = 0.0f;
                 specularAttenuation = 0.0f;
             }
@@ -411,8 +418,6 @@ void RayTracer::localIllumination(HitPoint* hitPoint, RGBColor* color) {
         float size = float(separateLights.size());
 
         for (int i = 0; i < size; i++) {
-
-//            cout << separateLights[i].centre << endl;
 
             float shadowAttenuation = 1.0f;
             float specularAttenuation = 1.0f;
@@ -493,24 +498,6 @@ Vector3f RayTracer::randomUnitPoint(HitPoint* hitPoint){
     }
 }
 
-Vector3f randomHem(){
-    float x;
-    float y;
-    float z;
-
-    while (true){
-        x = (rand() / (RAND_MAX + 1.0))*2 -1;
-        y = (rand() / (RAND_MAX + 1.0))*2 -1;
-
-        if(x*x + y*y < 1){
-            z = sqrt(1-x*x-y*y);
-            break;
-        }
-    }
-
-    return Vector3f(x,y,z);
-}
-
 bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
 
     HitPoint hitPoint = HitPoint(ray);
@@ -541,14 +528,10 @@ bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
         // check if we intersected
         if (hitPoint.intersected){
 
-            if (bounces == 0)
-                firstPoint = Vector3f(hitPoint.point);
-
             // keeping track of the bounces
             bounces++;
 
-//            float attenuation = hitPoint.normal.dot(hitPoint.ray->beam);
-            float  attenuation = 0.6;
+            float  attenuation = 0.4;
 
             sumColor = sumColor + hitPoint.geo->getDiffuseColor() * attenuation;
 
@@ -586,12 +569,7 @@ bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
             Vector3f L = light->centre - hitPoint.point;
             L.normalize();
 
-            // checking shadows
-            Ray lightDirection = Ray(hitPoint.point, light->centre);
-            HitPoint shadowHit = HitPoint(&lightDirection);
-            intersectGeometry(&shadowHit);
-
-            if ((shadowHit.intersected) && (shadowHit.geo != hitPoint.geo) && ((shadowHit.point - hitPoint.point).norm() < (light->centre - hitPoint.point).norm())){
+            if (inShadowGlobal(hitPoint.point, light->centre, hitPoint.normal)){
                 sumColor = sumColor + RGBColor(0,0,0);
             }else {
                 // diffuse coefficient
@@ -600,7 +578,6 @@ bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
                 sumColor = sumColor +
                            (diffuseCoefficient * light->getDiffuseIntensity() * hitPoint.geo->getDiffuseColor());
             }
-
         }
 
         // we go to the light(s)
@@ -610,7 +587,7 @@ bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
             Vector3f L = light->areaCentre - hitPoint.point;
             L.normalize();
 
-            if (inShadowRectangle(hitPoint.point, light->areaCentre, hitPoint.normal)){
+            if (inShadowGlobal(hitPoint.point, light->areaCentre, hitPoint.normal)){
                 sumColor = sumColor + RGBColor(0,0,0);
             }else {
                 // diffuse coefficient
@@ -632,34 +609,6 @@ bool RayTracer::globalIllumination(Ray *ray, RGBColor *color) {
 
 }
 
-bool RayTracer::inShadowTemp(HitPoint* hitPoint, Vector3f lightPosition){
-
-    // prevent shadow acne
-    Vector3f origin = (hitPoint->normal * 0.0001) + hitPoint->point;
-
-    // ray direction from point to light position
-    Ray pointToShadow = Ray(origin, lightPosition);
-
-    // hitpoint to check intersection
-    HitPoint shadowHitPoint = HitPoint(&pointToShadow);
-
-    // intersecting with geometry
-    intersectGeometry(&shadowHitPoint);
-
-
-    if (shadowHitPoint.intersected){
-
-        float distanceToOrigin = Geometry::vectorDistance(lightPosition, origin);
-        float distanceToIntersection = Geometry::vectorDistance(lightPosition, shadowHitPoint.point);
-
-        // if the light is closer we are not in shadow
-        if ( distanceToOrigin < distanceToIntersection)
-            return false;
-    }
-
-    return shadowHitPoint.intersected;
-}
-
 bool RayTracer::inShadow(Vector3f point, Vector3f lightPosition, Vector3f normal){
 
     Vector3f origin = point + normal * 0.01;
@@ -677,24 +626,7 @@ bool RayTracer::inShadow(Vector3f point, Vector3f lightPosition, Vector3f normal
     return shadowIntersection.intersected;
 }
 
-bool RayTracer::inShadowALRect(Vector3f point, Vector3f lightPosition, Vector3f normal){
-
-    Vector3f origin = point + normal * 0.01;
-
-    Ray shadowRay = Ray(origin, lightPosition);
-
-    HitPoint shadowIntersection = HitPoint(&shadowRay);
-
-    intersectGeometry(&shadowIntersection);
-
-    if ( shadowIntersection.intersected && Geometry::vectorDistance(point, lightPosition) <= Geometry::vectorDistance(point, shadowIntersection.point)) {
-        return false;
-    }
-
-    return shadowIntersection.intersected;
-}
-
-bool RayTracer::inShadowRectangle(Vector3f point, Vector3f lightPosition, Vector3f normal){
+bool RayTracer::inShadowGlobal(Vector3f point, Vector3f lightPosition, Vector3f normal){
 
     Vector3f origin = point + normal * 0.1;
 
@@ -783,18 +715,10 @@ bool RayTracer::render() {
     int width = currentOutput->resolution.width;
     int height =currentOutput->resolution.height;
 
-    // ppm file creation
-//    ofstream outputFile;
-//    outputFile.open(currentOutput->filename);
-
-    // ppm parameters
-//    outputFile << "P3\n" << width << ' ' << height << "\n255\n";
-
     vector<double> buffer;
 
     // iterating over all the pixels
     for(int y = 0; y < height ; y++){
-        cout << y << endl;
         for(int x = 0; x < width; x++){
 
             // default color
@@ -807,6 +731,8 @@ bool RayTracer::render() {
             RGBColor sumColor = RGBColor();
 
             if (currentOutput->globalIllum) {
+
+                color = RGBColor(0.5,0.5,0.5);
 
                 // iterating over the samples in the pixel
                 for (int i = 0; i < currentOutput->raysPerPixel[0]; i++) {
@@ -827,6 +753,8 @@ bool RayTracer::render() {
                         }
                     }
                 }
+
+                if (totalSamples<=0)color = RGBColor(currentOutput->bgColor.getR(), currentOutput->bgColor.getG(), currentOutput->bgColor.getB());
 
             }
             else {
@@ -884,21 +812,15 @@ bool RayTracer::render() {
             if (totalSamples > 1 )
                 color = sumColor * (1.0f/float(totalSamples));
 
-            // writing color to the file
-//            color->writeColor(outputFile);
-
-            buffer.push_back(color.getRGBArray()[0]);
-            buffer.push_back(color.getRGBArray()[1]);
-            buffer.push_back(color.getRGBArray()[2]);
+            buffer.push_back(color.getFinalR());
+            buffer.push_back(color.getFinalG());
+            buffer.push_back(color.getFinalB());
 
         }
 
     }
 
     save_ppm(currentOutput->filename,buffer, currentOutput->resolution.width, currentOutput->resolution.height);
-
-
-//    outputFile.close();
 
 }
 
