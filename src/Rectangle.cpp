@@ -42,6 +42,12 @@ Rectangle::Rectangle(float ambientReflection,
                     this->setP3(p3);
                     this->setP4(p4);
 
+                    normalA = p1;
+                    normalB = p2;
+                    normalC = p3;
+
+                    this->type = "sphere";
+
                     triangle1.a = p1;
                     triangle1.b = p2;
                     triangle1.c = p3;
@@ -64,8 +70,7 @@ std::ostream &operator<<(std::ostream &os, const Rectangle &rectangle) {
 // returns the point of intersection
 Vector3f Rectangle:: findIntersection(struct triangle triangle, Ray *ray){
 
-    Vector3f normal = getNormal(triangle.a, triangle.b, triangle.c);
-
+    Vector3f normal = getNormal(normalA, normalB, normalC);
 
     float t = getT(&ray->origin, triangle.a, &ray->beam, &normal);
 
@@ -97,4 +102,12 @@ Vector3f Rectangle::intersect(Ray *ray) {
     if (intersectionPoint.x() < INFINITY) return intersectionPoint;
 
     return Vector3f(INFINITY,INFINITY,INFINITY);
+}
+
+Rectangle::~Rectangle() {
+    delete p1;
+    delete p2;
+    delete p3;
+    delete p4;
+
 }

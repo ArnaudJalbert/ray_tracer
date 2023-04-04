@@ -32,6 +32,10 @@ public:
     Vector3f* p3; // coordinates of point #3
     Vector3f* p4; // coordinates of point #4
 
+    Vector3f* normalA;
+    Vector3f* normalB;
+    Vector3f* normalC;
+
     struct triangle triangle1;
     struct triangle triangle2;
 
@@ -46,6 +50,8 @@ public:
     Rectangle(float ambientReflection, float diffuseReflection, float specularReflection, float phongCoefficient,
               const RGBColor &ambientColor, const RGBColor &diffuseColor, const RGBColor &specularColor,
               Vector3f *p1, Vector3f *p2, Vector3f *p3, Vector3f *p4);
+
+    virtual ~Rectangle();
 
     //-------------
 
@@ -146,10 +152,10 @@ public:
         Vector3f sabNormal = getNormal(triangle.a, triangle.c, triangle.b);
         int sab = sign(triangle.a, triangle.b, p, normal);
 
-        return sbc == 1 && sca == 1 && sab == 1;
+        return (sbc == 1 && sca == 1 && sab == 1) || (sbc == -1 && sca == -1 && sab == -1);
     }
 
-    static Vector3f findIntersection(struct triangle triangle, Ray *ray);
+    Vector3f findIntersection(struct triangle triangle, Ray *ray);
 
     Vector3f intersect(Ray* ray) override;
     //------------------

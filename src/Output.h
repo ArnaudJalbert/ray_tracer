@@ -11,6 +11,9 @@
 class Output {
 
 public:
+
+    virtual ~Output();
+
     // camera of the scene
     Camera* camera;
 
@@ -34,6 +37,8 @@ public:
     float raysPerPixel[3];
 
     float n;
+
+    RGBColor ai;
 
     RGBColor bgColor;
 

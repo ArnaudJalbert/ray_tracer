@@ -218,21 +218,7 @@
             "visible": true
 
         },
-        {
-            "type":"sphere",
-            "centre":[300, 450, -150],
-            "radius":100,
 
-            "ac":[0,1,0],
-            "dc":[1,0,0],
-            "sc":[1,1,1],
-
-            "ka":1,
-            "kd":1,
-            "ks":1,
-
-            "pc":10
-        },
         {
             "comment":"large block right",
             "type":"rectangle",
@@ -344,7 +330,7 @@
         },
         {
             "type":"point",
-            "centre":[278, 273, 800],
+            "centre":[278, 540, -280],
             "id":[1, 1, 1],
             "is":[1, 1, 1],
             "use": false
@@ -362,8 +348,8 @@
 
         "globalillum": true,
         "raysperpixel": [10,10],
-        "maxbounces": 3,
-        "probterminate": 0.333
+        "maxbounces": 2,
+        "probterminate": 0.5
     }
     ]
 }

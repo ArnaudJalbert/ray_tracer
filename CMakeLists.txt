@@ -12,8 +12,6 @@ project(raytracer)
 add_compile_options(-DSTUDENT_SOLUTION)
 
 
-
-
 # 2
 # This define is used by the teaching team to compile and run the official solution
 # Students: for your project this define should always be commented out
@@ -55,7 +53,5 @@ include_directories(external/)
 aux_source_directory(external SOURCE)
 aux_source_directory(src SOURCE)
 
-string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fsanitize=address")
-
- add_executable(raytracer main.cpp ${SOURCE}) #The name of the cpp file and its path can vary
+add_executable(raytracer main.cpp ${SOURCE}) #The name of the cpp file and its path can vary
 

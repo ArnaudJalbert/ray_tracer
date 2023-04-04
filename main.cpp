@@ -16,7 +16,6 @@
 
 #include "external/json.hpp"
 #include "external/simpleppm.h"
-#include "ClassTests.hpp"
 
 
 using namespace std;
@@ -31,17 +30,14 @@ int main(int argc, char* argv[])
         cout<<"Invalid number of arguments"<<endl;
         cout<<"Usage: ./raytracer [scene] "<<endl;
         cout<<"Run sanity checks"<<endl;
-        
+
         test_eigen();
         test_save_ppm();
 
-        // CUSTOM TESTS. TO BE REMOVED
-        runTests();
-        
     } else {
-        
+
         cout<<"Scene: "<<argv[1]<<endl;
-        
+
         std::ifstream t(argv[1]);
         if(!t){
             cout<<"File "<<argv[1]<<" does not exist!"<<endl;
