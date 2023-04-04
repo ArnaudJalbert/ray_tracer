@@ -1,0 +1,193 @@
+{
+    "geometry":[{
+        "comment":"back_wall",
+        "type":"rectangle",
+        "p2":[556, 0, -559],
+        "p1":[0, 0, -559],
+        "p4":[0, 548.8, -559],
+        "p3":[556, 548.8, -559],
+
+
+        "ac":[1,1,1],
+        "dc":[1,1,1],
+        "sc":[0,0,0],
+
+        "ka":0,
+        "kd":1,
+        "ks":0,
+
+        "pc":0,
+
+        "visible": true
+
+    },
+        {
+            "comment":"right_wall",
+            "type":"rectangle",
+            "p1":[556, 0, -559],
+            "p2":[556, 0, 0],
+            "p3":[556, 548.8, 0],
+            "p4":[556, 548.8, -559],
+
+
+            "ac":[1,0,0],
+            "dc":[1,1,1],
+            "sc":[0,0,0],
+
+            "ka":0,
+            "kd":1,
+            "ks":0,
+
+            "pc":0,
+            "visible": true
+
+        },
+        {
+            "comment":"left_wall",
+            "type":"rectangle",
+            "p2":[0, 0, -559],
+            "p1":[0, 0, 0],
+            "p4":[0, 548.8, 0],
+            "p3":[0, 548.8, -559],
+
+            "ac":[0,1,0],
+            "dc":[0,1,0],
+            "sc":[0,0,0],
+
+            "ka":0,
+            "kd":1,
+            "ks":0,
+
+            "pc":0,
+            "visible": true
+
+        },
+        {
+            "comment":"ceiling",
+            "type":"rectangle",
+            "p1":[0, 548.8, 0],
+            "p2":[0, 548.8, -559],
+            "p3":[556, 548.8, -559.0],
+            "p4":[556, 548.8, 0],
+
+
+            "ac":[1,1,1],
+            "dc":[0.5,1,5],
+            "sc":[0,0,0],
+
+            "ka":0,
+            "kd":1,
+            "ks":0,
+
+            "pc":0,
+            "visible": true
+
+        },
+        {
+            "comment":"floor",
+            "type":"rectangle",
+            "p1":[0, 0, 0],
+            "p4":[0, 0, -559],
+            "p3":[556, 0, -559.0],
+            "p2":[556, 0, 0],
+
+
+            "ac":[1,1,1],
+            "dc":[0.3,0.5,0.5],
+            "sc":[0,0,0],
+
+            "ka":0,
+            "kd":1,
+            "ks":0,
+
+            "pc":0,
+            "visible": true
+
+        },
+        {
+            "comment":"small block top",
+            "type":"sphere",
+
+            "centre":[180, 200, -255],
+            "radius": 100,
+
+
+            "ac":[1,0,1],
+            "dc":[1,1,1],
+            "sc":[0,0,0],
+
+            "ka":0,
+            "kd":1,
+            "ks":0,
+
+            "pc":0,
+
+            "visible": true
+
+        },
+        {
+            "comment":"ssphere1",
+            "type":"sphere",
+
+            "centre":[380, 250, -305],
+            "radius": 100,
+
+
+            "ac":[1,0,1],
+            "dc":[1,1,1],
+            "sc":[0,0,0],
+
+            "ka":0,
+            "kd":1,
+            "ks":0,
+
+            "pc":0,
+
+            "visible": true
+
+        }
+
+    ],
+    "light":[
+
+        {
+            "type":"point",
+            "centre":[278, 540, -280],
+            "id":[1, 1, 0],
+            "is":[1, 0, 1]
+        }
+    ],
+    "output":[
+
+{
+    "filename":"custom2.ppm",
+    "size":[1080,1080],
+    "lookat":[0,0,-1],
+    "up":[0,1,0],
+    "fov":60,
+    "centre":[278, 273, 600],
+    "ai":[1,1,1],
+    "bkc":[0,0,0],
+    "n": 3,
+
+    "globalillum": false
+},
+
+        {
+        "filename":"custom1.ppm",
+        "size":[500,500],
+        "lookat":[0,0,-1],
+        "up":[0,1,0],
+        "fov":40,
+        "centre":[278, 273, 800],
+        "ai":[1,1,1],
+        "bkc":[0.5,0.5,0.5],
+        "n": 8,
+
+        "globalillum": true,
+        "raysperpixel": [10, 10],
+        "maxbounces": 3,
+        "probterminate": 0.333
+    }
+    ]
+}
